@@ -62,7 +62,7 @@ class ServiceBrokerHandler implements Handler {
         try {
             context = getAuthContext(context, request);
         } catch (AuthenticationFailedException e) {
-            return newResultPromise(new Response(Status.UNAUTHORIZED).setEntity(json(object())));
+            return newResultPromise(newEmptyResponse(Status.UNAUTHORIZED));
         }
         return router.handle(context, request);
     }
@@ -92,7 +92,7 @@ class ServiceBrokerHandler implements Handler {
         @Override
         public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
             if (!"GET".equals(request.getMethod())) {
-                return newResultPromise(new Response(METHOD_NOT_ALLOWED));
+                return newResultPromise(newEmptyResponse(METHOD_NOT_ALLOWED));
             }
             JsonValue result = json(object(field("services", array(object(
                     field("id", "3997be2d-e262-438e-8a31-8c90fa7156e5"),
@@ -111,7 +111,7 @@ class ServiceBrokerHandler implements Handler {
                             )
                     ))
             )))));
-            return newResultPromise(new Response(Status.OK).setEntity(result));
+            return newResultPromise(newEmptyResponse(Status.OK).setEntity(result));
         }
     }
 
@@ -126,17 +126,17 @@ class ServiceBrokerHandler implements Handler {
             } else if ("DELETE".equals(request.getMethod())) {
                 return handleDelete(context, request, instanceId);
             }
-            return newResultPromise(new Response(METHOD_NOT_ALLOWED));
+            return newResultPromise(newEmptyResponse(METHOD_NOT_ALLOWED));
         }
 
         private Promise<Response, NeverThrowsException> handleCreate(Context context, Request request,
                 String instanceId) {
-            return newResultPromise(new Response(Status.OK).setEntity(json(object())));
+            return newResultPromise(newEmptyResponse(Status.OK));
         }
 
         private Promise<Response, NeverThrowsException> handleUpdate(Context context, Request request,
                 String instanceId) {
-            return newResultPromise(new Response(Status.OK).setEntity(json(object())));
+            return newResultPromise(newEmptyResponse(Status.OK));
         }
 
         private Promise<Response, NeverThrowsException> handleDelete(Context context, Request request,
@@ -153,10 +153,10 @@ class ServiceBrokerHandler implements Handler {
                             JsonValue json = json(response.getEntity().getJson());
                             json.get("results");
                         } catch (IOException e) {
-                            return new Response(Status.INTERNAL_SERVER_ERROR).setEntity(json(object()));
+                            return newEmptyResponse(Status.INTERNAL_SERVER_ERROR);
                         }
                     } else if (response.getStatus() == Status.CONFLICT) {
-                        return new Response(Status.CONFLICT).setEntity(json(object()));
+                        return newEmptyResponse(Status.CONFLICT);
                     }
                     return response;
                 }
@@ -174,7 +174,7 @@ class ServiceBrokerHandler implements Handler {
             } else if ("DELETE".equals(request.getMethod())) {
                 return handleDelete(context, request, instanceId, bindingId);
             }
-            return newResultPromise(new Response(METHOD_NOT_ALLOWED));
+            return newResultPromise(newEmptyResponse(METHOD_NOT_ALLOWED));
         }
 
         private Promise<Response, NeverThrowsException> handleCreate(Context context, Request request,
@@ -182,14 +182,14 @@ class ServiceBrokerHandler implements Handler {
             try {
                 JsonValue requestBody = json(request.getEntity().getJson());
                 if (!requestBody.get("bind_resource").isDefined("app_guid")) {
-                    return newResultPromise(new Response(Status.valueOf(422, "Unprocessable Entity")).setEntity(json(object(
+                    return newResultPromise(newEmptyResponse(Status.valueOf(422, "Unprocessable Entity")).setEntity(json(object(
                             field("error", "RequiresApp"),
                             field("description", "This service supports generation of credentials through binding an application only.")
                     ))));
                 }
 
                 final String username = instanceId + "-" + bindingId;
-                final String password = "foo";
+                final String password = "foo"; // TODO: Generate securely
                 JsonValue responseBody = json(object(
                         field("username", username),
                         field("userpassword", password),
@@ -206,20 +206,21 @@ class ServiceBrokerHandler implements Handler {
                     @Override
                     public Response apply(Response response) throws NeverThrowsException {
                         if (response.getStatus().isSuccessful()) {
-                            return new Response(Status.CREATED).setEntity(json(object(
+                            return newEmptyResponse(Status.CREATED).setEntity(json(object(
                                     field("credentials", object(
                                             field("username", username),
                                             field("password", password)
                                     ))
                             )));
                         } else if (response.getStatus() == Status.CONFLICT) {
-                            return new Response(Status.CONFLICT).setEntity(json(object()));
+                            return newEmptyResponse(Status.CONFLICT);
+                        } else {
+                            return newEmptyResponse(Status.INTERNAL_SERVER_ERROR);
                         }
-                        return response;
                     }
                 });
             } catch (IOException e) {
-                return newResultPromise(new Response(Status.INTERNAL_SERVER_ERROR).setEntity(json(object())));
+                return newResultPromise(newEmptyResponse(Status.INTERNAL_SERVER_ERROR));
             }
         }
 
@@ -234,9 +235,9 @@ class ServiceBrokerHandler implements Handler {
                 @Override
                 public Response apply(Response response) throws NeverThrowsException {
                     if (response.getStatus().isSuccessful()) {
-                        return new Response(Status.CREATED).setEntity(json(object()));
+                        return newEmptyResponse(Status.CREATED);
                     } else if (response.getStatus() == Status.BAD_REQUEST) { // TODO: Is this a good assumption?
-                        return new Response(Status.GONE).setEntity(json(object()));
+                        return newEmptyResponse(Status.GONE);
                     }
                     return response;
                 }
@@ -284,8 +285,12 @@ class ServiceBrokerHandler implements Handler {
         }, new AsyncFunction<AuthenticationFailedException, Response, NeverThrowsException>() {
             @Override
             public Promise<Response, NeverThrowsException> apply(AuthenticationFailedException exception) throws NeverThrowsException {
-                return newResultPromise(new Response(Status.UNAUTHORIZED).setEntity(json(object())));
+                return newResultPromise(newEmptyResponse(Status.UNAUTHORIZED));
             }
         });
+    }
+
+    private static Response newEmptyResponse(Status status) {
+        return new Response(status).setEntity(json(object()));
     }
 }
