@@ -51,6 +51,9 @@ public class ServiceBroker {
         try {
             String authorizationTokenDecoded = new String(BaseEncoding.base64().decode(authorizationToken), Charset.forName("UTF-8"));
             String[] authorizationTokenParts = authorizationTokenDecoded.split(":", 2);
+            if (authorizationTokenParts.length < 2) {
+                throw new AuthenticationFailedException();
+            }
             String username = authorizationTokenParts[0];
             String password = authorizationTokenParts[1];
             return new BasicAuthorizationContext(context, username, password);

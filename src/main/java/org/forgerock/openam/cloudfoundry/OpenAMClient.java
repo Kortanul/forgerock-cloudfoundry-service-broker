@@ -61,6 +61,8 @@ public class OpenAMClient {
         return sendWithCredentials(authUsername, authPassword, queryClientRequest);
     }
 
+    private Promise<String, NeverThrowsException>
+
     private Promise<String, AuthenticationFailedException> getOpenAmSession(String username, String password) {
         Request authenticateRequest = new Request();
         authenticateRequest.setMethod("POST");
@@ -87,7 +89,7 @@ public class OpenAMClient {
             @Override
             public Promise<Response, NeverThrowsException> apply(String token) throws NeverThrowsException {
                 String headerName = "iPlanetDirectoryPro"; // TODO: Get this via config
-                request.getHeaders().put(headerName, token);
+                request.getHeaders().add(headerName, token);
                 return client.send(request);
             }
         }, new AsyncFunction<AuthenticationFailedException, Response, NeverThrowsException>() {

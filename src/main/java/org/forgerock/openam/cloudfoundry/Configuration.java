@@ -12,7 +12,7 @@ public class Configuration {
         }
         URI apiBaseUri = new URI(baseUri + "/").resolve("json/");
         if (realm != null) {
-            apiBaseUri = apiBaseUri.resolve(realm + "/");
+            apiBaseUri = apiBaseUri.resolve(realm.replaceFirst("^/", "") + "/");
         }
         openAmApiBaseUrl = apiBaseUri;
     }
