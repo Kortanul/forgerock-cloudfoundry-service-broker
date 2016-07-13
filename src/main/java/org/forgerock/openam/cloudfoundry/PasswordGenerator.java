@@ -16,7 +16,20 @@
 
 package org.forgerock.openam.cloudfoundry;
 
+import java.util.UUID;
+
 /**
- * Exception thrown when Authentication against OpenAM fails
+ * Generator of passwords for OpenAM Clients
  */
-public class AuthenticationFailedException extends Exception { }
+public class PasswordGenerator {
+
+    /**
+     * Returns a randomly generated password
+     * @return
+     * A randomly generated password
+     */
+    public String generatePassword() {
+        return UUID.randomUUID().toString();
+    }
+
+}

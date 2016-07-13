@@ -16,21 +16,31 @@
 
 package org.forgerock.openam.cloudfoundry;
 
-import java.net.URISyntaxException;
-
 import org.forgerock.http.Handler;
 import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
+import org.forgerock.openam.cloudfoundry.client.HttpClientImpl;
+import org.forgerock.openam.cloudfoundry.client.OpenAMClient;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 
+/**
+ * Handler for Cloud Foundry broker tasks
+ */
 class ServiceBrokerHandler implements Handler {
-    private final ServiceBroker broker = new ServiceBroker(new ConfigurationEnvironmentReader().read());
 
-    ServiceBrokerHandler() throws HttpApplicationException, URISyntaxException {
-    }
+    private final ServiceBroker broker = new ServiceBroker(new HttpClientImpl(),
+                                                            new ConfigurationEnvironmentReader().read(),
+                                                            new PasswordGenerator());
+
+    /**
+     * Constructs new ServiceBrokerHandler
+     *
+     * @throws HttpApplicationException if underlying {@link OpenAMClient} throws a {@link HttpApplicationException}
+     */
+    ServiceBrokerHandler() throws HttpApplicationException { }
 
     @Override
     public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
