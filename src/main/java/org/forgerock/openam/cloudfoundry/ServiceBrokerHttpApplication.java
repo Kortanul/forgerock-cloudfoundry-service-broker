@@ -24,14 +24,14 @@ import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.io.Buffer;
 import org.forgerock.util.Factory;
 
+/**
+ * HTTP Application to handle Cloud Foundry broker tasks
+ */
 public class ServiceBrokerHttpApplication implements HttpApplication {
+
     @Override
     public Handler start() throws HttpApplicationException {
-        try {
-            return new ServiceBrokerHandler();
-        } catch (URISyntaxException e) {
-            throw new HttpApplicationException(e);
-        }
+        return new ServiceBrokerHandler();
     }
 
     @Override
@@ -40,8 +40,6 @@ public class ServiceBrokerHttpApplication implements HttpApplication {
     }
 
     @Override
-    public void stop() {
-
-    }
+    public void stop() { }
 
 }
