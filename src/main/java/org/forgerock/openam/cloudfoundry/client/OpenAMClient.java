@@ -86,6 +86,10 @@ public class OpenAMClient {
         }
     }
 
+    public String getEndpoint() {
+        return configuration.getOpenAmApiRealmUrl().toString();
+    }
+
     /**
      * Creates an OAuth2 Client in OpenAM
      *

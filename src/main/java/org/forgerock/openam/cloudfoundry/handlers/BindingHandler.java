@@ -108,6 +108,7 @@ public class BindingHandler implements Handler {
                     if (response.getStatus().isSuccessful()) {
                         return newEmptyResponse(Status.CREATED).setEntity(json(object(
                                 field("credentials", object(
+                                        field("uri", openAMClient.getEndpoint()),
                                         field("username", username),
                                         field("password", password)
                                 ))
