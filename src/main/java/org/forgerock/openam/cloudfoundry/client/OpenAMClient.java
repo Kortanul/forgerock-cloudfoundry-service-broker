@@ -87,7 +87,7 @@ public class OpenAMClient {
     }
 
     public String getEndpoint() {
-        return configuration.getOpenAmApiRealmUrl().toString();
+        return configuration.getOpenAmApiBaseUrl().toString();
     }
 
     /**

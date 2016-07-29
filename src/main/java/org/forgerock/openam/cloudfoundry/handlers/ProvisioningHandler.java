@@ -17,7 +17,9 @@
 package org.forgerock.openam.cloudfoundry.handlers;
 
 import static org.forgerock.http.protocol.Status.METHOD_NOT_ALLOWED;
+import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.openam.cloudfoundry.Responses.newEmptyResponse;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
@@ -77,7 +79,8 @@ public class ProvisioningHandler implements Handler {
             case "PUT":
             case "PATCH":
                 LOGGER.info("Provisioning instance " + instanceId);
-                return newResultPromise(newEmptyResponse(Status.OK));
+                return newResultPromise(newEmptyResponse(Status.OK).setEntity(json(object(
+                        field("dashboard_uri", openAMClient.getEndpoint())))));
             case "DELETE":
                 return handleDelete(context, request, instanceId);
             default:
