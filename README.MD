@@ -65,9 +65,9 @@ The broker can also be deployed into non-Pivotal Cloud Foundry installations, al
 	`cf push forgerockbroker-{version}`
 4. Set the required environment variables for the broker  
 	`cf set-env forgerockbroker-{version} OPENAM_BASE_URI {location}`  
-	cf set-env forgerockbroker-{version} OPENAM_USERNAME {username}`  
-	cf set-env forgerockbroker-{version} OPENAM_PASSWORD {password}`  
-	cf set-env forgerockbroker-{version} OPENAM_REALM {realm}`
+	`cf set-env forgerockbroker-{version} OPENAM_USERNAME {username}`  
+	`cf set-env forgerockbroker-{version} OPENAM_PASSWORD {password}`  
+	`cf set-env forgerockbroker-{version} OPENAM_REALM {realm}`
 5. Restage the application so that changes to the environment variables are applied  
 	`cf restage forgerockbroker-{version}`
 6. Find the url for the application
