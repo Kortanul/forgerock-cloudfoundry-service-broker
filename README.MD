@@ -19,6 +19,8 @@ It is advised to create specific user credentials to allow the Cloud Foundry Bro
 4. Create a group for the broker user.
 5. Select the Privilege tab and add "Read and write access to all configured Agents" privilege to the group.
 
+---
+
 Cloud Foundry
 -------------
 
@@ -62,6 +64,8 @@ To remove the Cloud Foundry Broker from Cloud Foundry the bindings, service, bro
 	`cf delete-service-broker forgerockbroker`
 4. Delete the application  
 	`cf delete forgerockbroker-{version}`
+
+---
 
 Pivotal Cloud Foundry
 ---------------------
