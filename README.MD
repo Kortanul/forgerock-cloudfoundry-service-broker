@@ -36,9 +36,9 @@ Pivotal Cloud Foundry allows the deployment of applications and brokers via a ti
 	d. Realm - the realm in which to create the OAuth2 clients (specify "/" to use the root realm)
 6. Click "Save" and return to the installation dashboard.
 7. Click "Apply Changes" to install the "Pivotal Cloud Foundry ForgeRock Broker".
-8. At the command line create the service
+8. At the command line create the service  
 	`cf create-service openam-oauth2 shared {servicename}`
-9. Bind applications as necessary
+9. Bind applications as necessary  
 	`cf bind-service {application} {servicename}`
 
 Removing the Cloud Foundry Broker from Pivotal Cloud Foundry
@@ -46,7 +46,7 @@ Removing the Cloud Foundry Broker from Pivotal Cloud Foundry
 
 Uninstalling the "Pivotal Cloud Foundry ForgeRock Broker" tile in the OpsMgr does not unbind applications from the broker or remove the OAuth2 clients from OpenAM. Unbinding must be performed before uninstallation.
 
-1. Unbind the application from the service broker
+1. Unbind the application from the service broker  
 	`cf unbind-service {application} {servicename}`
 2. Log in to Pivotal Cloud Foundry OpsMgr.
 3. Click on the trashcan icon on the bottom right of the "Pivotal Cloud Foundry ForgeRock Broker" tile.
