@@ -75,8 +75,7 @@ public class ProvisioningHandler implements Handler {
             case "PUT":
             case "PATCH":
                 LOGGER.info("Provisioning instance " + instanceId);
-                return newResultPromise(newEmptyResponse(Status.OK).setEntity(json(object(
-                        field("dashboard_uri", openAMClient.getOAuth2Endpoint().toString())))));
+                return newResultPromise(newEmptyResponse(Status.OK).setEntity(json(object())));
             case "DELETE":
                 return handleDelete(context, request, instanceId);
             default:
