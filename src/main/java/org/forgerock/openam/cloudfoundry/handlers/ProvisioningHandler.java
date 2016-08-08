@@ -53,24 +53,20 @@ public class ProvisioningHandler implements Handler {
     private final OpenAMClient openAMClient;
 
     /**
-     * Constructor
+     * Constructs a new ProvisioningHandler.
      *
-     * @param openAMClient
-     * The {@link OpenAMClient} used to communicate with OpenAM
+     * @param openAMClient The {@link OpenAMClient} used to communicate with OpenAM.
      */
     public ProvisioningHandler(OpenAMClient openAMClient) {
         this.openAMClient = openAMClient;
     }
 
     /**
-     * Handles provisioning and deprovisioning operations
+     * Handles provisioning and deprovisioning operations.
      *
-     * @param context
-     * The {@link Context}
-     * @param request
-     * The {@link Request}
-     * @return
-     * A {@link Promise} of a {@link Response}
+     * @param context The {@link Context}.
+     * @param request The {@link Request}.
+     * @return A {@link Promise} of a {@link Response}.
      */
     @Override
     public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
@@ -80,7 +76,7 @@ public class ProvisioningHandler implements Handler {
             case "PATCH":
                 LOGGER.info("Provisioning instance " + instanceId);
                 return newResultPromise(newEmptyResponse(Status.OK).setEntity(json(object(
-                        field("dashboard_uri", openAMClient.getEndpoint())))));
+                        field("dashboard_uri", openAMClient.getOAuth2Endpoint().toString())))));
             case "DELETE":
                 return handleDelete(context, request, instanceId);
             default:

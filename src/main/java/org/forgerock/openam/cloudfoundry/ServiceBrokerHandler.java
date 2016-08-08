@@ -27,7 +27,9 @@ import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 
 /**
- * Handler for Cloud Foundry broker tasks
+ * Root HTTP request handler for the service broker.
+ *
+ * <p>Delegates to {@link ServiceBroker}.</p>
  */
 class ServiceBrokerHandler implements Handler {
 
@@ -36,9 +38,9 @@ class ServiceBrokerHandler implements Handler {
                                                             new PasswordGenerator());
 
     /**
-     * Constructs new ServiceBrokerHandler
+     * Constructs new ServiceBrokerHandler.
      *
-     * @throws HttpApplicationException if underlying {@link OpenAMClient} throws a {@link HttpApplicationException}
+     * @throws HttpApplicationException if underlying {@link OpenAMClient} throws a {@link HttpApplicationException}.
      */
     ServiceBrokerHandler() throws HttpApplicationException { }
 

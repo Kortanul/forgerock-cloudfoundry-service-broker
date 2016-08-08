@@ -30,12 +30,10 @@ public final class Responses {
     private Responses() { }
 
     /**
-     * Constructs a new empty response
+     * Constructs a new empty response.
      *
-     * @param status
-     * The {@link Status} of the response
-     * @return
-     * An empty {@link Response} with the specified {@link Status}
+     * @param status The {@link Status} of the response.
+     * @return An empty {@link Response} with the specified {@link Status}.
      */
     public static Response newEmptyResponse(Status status) {
         return new Response(status).setEntity(json(object()));

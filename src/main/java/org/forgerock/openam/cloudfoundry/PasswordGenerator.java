@@ -19,17 +19,14 @@ package org.forgerock.openam.cloudfoundry;
 import java.util.UUID;
 
 /**
- * Generator of passwords for OpenAM Clients
+ * Securely generates passwords.
  */
 public class PasswordGenerator {
-
     /**
-     * Returns a randomly generated password
-     * @return
-     * A randomly generated password
+     * Returns a randomly generated password.
+     * @return A randomly generated password.
      */
     public String generatePassword() {
         return UUID.randomUUID().toString();
     }
-
 }

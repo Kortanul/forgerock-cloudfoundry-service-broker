@@ -23,34 +23,30 @@ import org.apache.commons.lang3.StringUtils;
 import org.forgerock.openam.cloudfoundry.client.OpenAMClient;
 
 /**
- * Configuration for {@link OpenAMClient}
+ * An immutable container for the configuration of the broker.
  */
-public class Configuration {
+public final class Configuration {
 
-    private static final String ROOT_REALM = "/";
-
-    private final URI openAmApiBaseUrl;
+    private final URI openAmOAuth2Url;
     private final URI openAmApiRealmUrl;
     private final String username;
     private final String password;
+    private final URI openAmApiBaseUrl;
 
     /**
-     * Constructor
+     * Constructs a new Configuration.
      *
-     * @param baseUri
-     * The base URI of OpenAM
-     * @param username
-     * The username to use to authenticate against OpenAM
-     * @param password
-     * The password to use to authenticate against OpenAM
-     * @param realm
-     * The OpenAM realm to use
+     * @param baseUri the base URI of OpenAM
+     * @param username the username to use to authenticate against OpenAM
+     * @param password the password to use to authenticate against OpenAM
+     * @param realm the OpenAM realm to use
      * @throws URISyntaxException if the OpenAM base URI is not a valid URI
      */
     public Configuration(String baseUri, String username, String password, String realm) {
 
+        URI openAmBaseUrl;
         try {
-            openAmApiBaseUrl = new URI(validateProperty(baseUri, "OPENAM_BASE_URI") + "/").resolve("json/");
+            openAmBaseUrl = new URI(validateProperty(baseUri, "OPENAM_BASE_URI") + "/");
         } catch (URISyntaxException e) {
             throw new IllegalStateException("OPENAM_BASE_URI is not a valid URI", e);
         }
@@ -58,18 +54,15 @@ public class Configuration {
         this.username = validateProperty(username, "OPENAM_USERNAME");
         this.password = validateProperty(password, "OPENAM_PASSWORD");
 
-        if (StringUtils.trimToNull(realm) == null || realm.equals(ROOT_REALM)) {
-            openAmApiRealmUrl = openAmApiBaseUrl;
-        } else {
-            openAmApiRealmUrl = openAmApiBaseUrl.resolve(realm.replaceFirst("^/", "") + "/");
-        }
-
+        realm = StringUtils.trimToEmpty(realm);
+        openAmApiBaseUrl = openAmBaseUrl.resolve("json/");
+        openAmApiRealmUrl = openAmBaseUrl.resolve("json/" + realm + "/");
+        openAmOAuth2Url = openAmBaseUrl.resolve("oauth2/" + realm + "/");
     }
 
     /**
      * Returns the OpenAM base URI
-     * @return
-     * The OpenAM base URI
+     * @return The OpenAM base URI
      */
     public URI getOpenAmApiBaseUrl() {
         return openAmApiBaseUrl;
@@ -77,22 +70,19 @@ public class Configuration {
 
     /**
      * Returns the OpenAM realm URI
-     * @return
-     * The OpenAM realm URI
+     * @return The OpenAM realm URI
      */
     public URI getOpenAmApiRealmUrl() { return openAmApiRealmUrl; }
 
     /**
      * Returns the username used to authenticate against OpenAM
-     * @return
-     * The username used to authenticate against OpenAM
+     * @return The username used to authenticate against OpenAM
      */
     public String getUsername() { return username; }
 
     /**
      * Returns the password used to authenticate against OpenAM
-     * @return
-     * The username used to authenticate against OpenAM
+     * @return The password used to authenticate against OpenAM
      */
     public String getPassword() { return password; }
 
@@ -101,5 +91,13 @@ public class Configuration {
             throw new IllegalStateException("Required configuration missing: " + variableName);
         }
         return value;
+    }
+
+    /**
+     * Returns the OpenAM OAuth2 base URI
+     * @return The OAuth2 URI
+     */
+    public URI getOpenAmOAuth2Url() {
+        return openAmOAuth2Url;
     }
 }
