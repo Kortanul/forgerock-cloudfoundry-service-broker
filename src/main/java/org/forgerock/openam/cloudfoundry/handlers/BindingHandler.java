@@ -39,7 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Handles binding/unbinding operations against OpenAM
+ * Handles binding/unbinding operations against OpenAM.
  */
 public class BindingHandler implements Handler {
 
@@ -49,12 +49,10 @@ public class BindingHandler implements Handler {
     private final PasswordGenerator passwordGenerator;
 
     /**
-     * Constructor
+     * Constructs a new BindingHandler.
      *
-     * @param openAMClient
-     * The {@link OpenAMClient} used to communicate with OpenAM
-     * @param passwordGenerator
-     * The {@link PasswordGenerator} used to generate OAuth2 Client passwords
+     * @param openAMClient The {@link OpenAMClient} used to communicate with OpenAM.
+     * @param passwordGenerator The {@link PasswordGenerator} used to generate OAuth2 Client passwords.
      */
     public BindingHandler(OpenAMClient openAMClient, PasswordGenerator passwordGenerator) {
         this.openAMClient = openAMClient;
@@ -62,14 +60,11 @@ public class BindingHandler implements Handler {
     }
 
     /**
-     * Handles binding and unbinding operations
+     * Handles binding and unbinding operations.
      *
-     * @param context
-     * The {@link Context}
-     * @param request
-     * The {@link Request}
-     * @return
-     * A {@link Promise} of a {@link Response}
+     * @param context The {@link Context}.
+     * @param request The {@link Request}.
+     * @return A {@link Promise} of a {@link Response}.
      */
     @Override
     public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
@@ -108,7 +103,7 @@ public class BindingHandler implements Handler {
                     if (response.getStatus().isSuccessful()) {
                         return newEmptyResponse(Status.CREATED).setEntity(json(object(
                                 field("credentials", object(
-                                        field("uri", openAMClient.getEndpoint()),
+                                        field("uri", openAMClient.getOAuth2Endpoint().toString()),
                                         field("username", username),
                                         field("password", password)
                                 ))

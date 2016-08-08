@@ -35,15 +35,15 @@ import org.forgerock.util.promise.Promise;
  */
 public class CatalogHandler implements Handler {
 
+    private static final String SERVICE_ID = "3997be2d-e262-438e-8a31-8c90fa7156e5";
+    private static final String PLAN_ID = "0140f6db-972a-466e-9e79-7845098a4ec7";
+
     /**
-     * Handles catalog operations
+     * Handles catalog operations.
      *
-     * @param context
-     * The {@link Context}
-     * @param request
-     * The {@link Request}
-     * @return
-     * A {@link Promise} of a {@link Response}
+     * @param context The {@link Context}.
+     * @param request The {@link Request}.
+     * @return A {@link Promise} of a {@link Response}.
      */
     @Override
     public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
@@ -51,7 +51,7 @@ public class CatalogHandler implements Handler {
             return newResultPromise(newEmptyResponse(METHOD_NOT_ALLOWED));
         }
         JsonValue result = json(object(field("services", array(object(
-                field("id", "3997be2d-e262-438e-8a31-8c90fa7156e5"),
+                    field("id", SERVICE_ID),
                 field("name", "openam-oauth2"),
                 field("description", "Uses ForgeRock OpenAM to provide OAuth 2.0 authorization"),
                 field("tags", array("authentication", "oauth2")),
@@ -61,7 +61,7 @@ public class CatalogHandler implements Handler {
                 )),
                 field("plans", array(
                         object(
-                                field("id", "0140f6db-972a-466e-9e79-7845098a4ec7"),
+                                field("id", PLAN_ID),
                                 field("name", "shared"),
                                 field("description", "Shared OpenAM server")
                         )

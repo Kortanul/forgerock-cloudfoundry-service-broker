@@ -33,20 +33,20 @@ import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 
 /**
- * ServiceBroker for Cloud Foundry broker tasks
+ * Root HTTP request handler for the service broker.
+ *
+ * <p>This is separate from {@link ServiceBrokerHandler} so that its dependencies can be injected by tests.</p>
  */
 public class ServiceBroker {
 
     private final Router router = new Router();
 
     /**
-     * Constructor
+     * Constructs a new ServiceBroker.
      *
-     * @param configuration
-     * The {@link Configuration} for the underlying {@link OpenAMClient}
-     * @param pwGen
-     * The {@link PasswordGenerator} used to generate client passwords
-     * @throws HttpApplicationException if the underlying {@link OpenAMClient} throws a {@link HttpApplicationException}
+     * @param configuration The {@link Configuration} for the underlying {@link OpenAMClient}.
+     * @param pwGen The {@link PasswordGenerator} used to generate client passwords.
+     * @throws HttpApplicationException if the underlying {@link OpenAMClient} throws a {@link HttpApplicationException}.
      */
     public ServiceBroker(HttpClient client, Configuration configuration, PasswordGenerator pwGen) throws HttpApplicationException {
         OpenAMClient openAMClient = new OpenAMClient(client, configuration);
@@ -59,12 +59,9 @@ public class ServiceBroker {
     /**
      * Handle the incoming {@link Request}
      *
-     * @param context
-     * The {@link Context}
-     * @param request
-     * The {@link Request}
-     * @return
-     * A {@link Promise} of a {@link Response}
+     * @param context The {@link Context}.
+     * @param request The {@link Request}.
+     * @return A {@link Promise} of a {@link Response}.
      */
     public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
         return router.handle(context, request);

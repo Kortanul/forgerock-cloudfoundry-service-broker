@@ -16,8 +16,6 @@
 
 package org.forgerock.openam.cloudfoundry;
 
-import java.net.URISyntaxException;
-
 import org.forgerock.http.Handler;
 import org.forgerock.http.HttpApplication;
 import org.forgerock.http.HttpApplicationException;
@@ -25,7 +23,9 @@ import org.forgerock.http.io.Buffer;
 import org.forgerock.util.Factory;
 
 /**
- * HTTP Application to handle Cloud Foundry broker tasks
+ * The main HTTP Application in the service broker.
+ *
+ * <p>Delegates to the {@link ServiceBrokerHandler}.</p>
  */
 public class ServiceBrokerHttpApplication implements HttpApplication {
 

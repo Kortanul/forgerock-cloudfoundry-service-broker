@@ -16,17 +16,14 @@
 
 package org.forgerock.openam.cloudfoundry;
 
-import java.net.URISyntaxException;
-
 /**
- * Reads {@link Configuration} properties from the system environment properties
+ * Reads {@link Configuration} properties from the system environment properties.
  */
 public class ConfigurationEnvironmentReader {
 
     /**
-     * Read the system environment properties into a {@link Configuration} object
-     * @return
-     * A {@link Configuration} object
+     * Read the system environment properties into a {@link Configuration} object.
+     * @return A {@link Configuration} object.
      */
     public Configuration read() {
         return new Configuration(
