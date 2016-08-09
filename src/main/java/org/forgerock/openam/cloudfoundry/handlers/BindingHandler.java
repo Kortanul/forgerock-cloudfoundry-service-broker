@@ -29,7 +29,7 @@ import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.cloudfoundry.client.OpenAMClient;
+import org.forgerock.openam.cloudfoundry.OpenAMClient;
 import org.forgerock.openam.cloudfoundry.PasswordGenerator;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Function;
@@ -72,12 +72,12 @@ public class BindingHandler implements Handler {
         String bindingId = context.asContext(UriRouterContext.class).getUriTemplateVariables().get("bindingId");
 
         switch (request.getMethod()) {
-            case "PUT":
-                return handleCreate(context, request, instanceId, bindingId);
-            case "DELETE":
-                return handleDelete(context, request, instanceId, bindingId);
-            default:
-                return newResultPromise(newEmptyResponse(METHOD_NOT_ALLOWED));
+        case "PUT":
+            return handleCreate(context, request, instanceId, bindingId);
+        case "DELETE":
+            return handleDelete(context, request, instanceId, bindingId);
+        default:
+            return newResultPromise(newEmptyResponse(METHOD_NOT_ALLOWED));
         }
     }
 
@@ -87,36 +87,41 @@ public class BindingHandler implements Handler {
         try {
             JsonValue requestBody = json(request.getEntity().getJson());
             if (!requestBody.get("bind_resource").isDefined("app_guid")) {
-                LOGGER.warn("Unable to create binding for instance " + instanceId + ", app_guid is missing from bind_resource");
-                return newResultPromise(newEmptyResponse(Status.valueOf(422, "Unprocessable Entity")).setEntity(json(object(
-                        field("error", "RequiresApp"),
-                        field("description", "This service supports generation of credentials through binding an application only.")
-                ))));
+                LOGGER.warn("Unable to create binding for instance " + instanceId
+                        + ", app_guid is missing from bind_resource");
+                return newResultPromise(newEmptyResponse(Status.valueOf(422, "Unprocessable Entity"))
+                        .setEntity(json(object(
+                            field("error", "RequiresApp"),
+                            field("description", "This service supports generation of credentials through binding an "
+                                    + "application only.")
+                    ))));
             }
 
             final String username = instanceId + "-" + bindingId;
             final String password = passwordGenerator.generatePassword();
 
-            return openAMClient.createClient(username, password).then(new Function<Response, Response, NeverThrowsException>() {
-                @Override
-                public Response apply(Response response) throws NeverThrowsException {
-                    if (response.getStatus().isSuccessful()) {
-                        return newEmptyResponse(Status.CREATED).setEntity(json(object(
-                                field("credentials", object(
-                                        field("uri", openAMClient.getOAuth2Endpoint().toString()),
-                                        field("username", username),
-                                        field("password", password)
-                                ))
-                        )));
-                    } else if (response.getStatus() == Status.CONFLICT) {
-                        LOGGER.warn("OpenAM already has a binding for " + instanceId + "-" + bindingId);
-                        return newEmptyResponse(Status.CONFLICT);
-                    } else {
-                        LOGGER.error("OpenAM returned an unexpected status (" + response.getStatus().getCode() + ") creating binding " + instanceId + "-" + bindingId);
-                        return newEmptyResponse(Status.INTERNAL_SERVER_ERROR);
-                    }
-                }
-            });
+            return openAMClient.createClient(username, password)
+                    .then(new Function<Response, Response, NeverThrowsException>() {
+                        @Override
+                        public Response apply(Response response) throws NeverThrowsException {
+                            if (response.getStatus().isSuccessful()) {
+                                return newEmptyResponse(Status.CREATED).setEntity(json(object(
+                                        field("credentials", object(
+                                                field("uri", openAMClient.getOAuth2Endpoint().toString()),
+                                                field("username", username),
+                                                field("password", password)
+                                        ))
+                                )));
+                            } else if (response.getStatus() == Status.CONFLICT) {
+                                LOGGER.warn("OpenAM already has a binding for " + instanceId + "-" + bindingId);
+                                return newEmptyResponse(Status.CONFLICT);
+                            } else {
+                                LOGGER.error("OpenAM returned an unexpected status (" + response.getStatus().getCode()
+                                        + ") creating binding " + instanceId + "-" + bindingId);
+                                return newEmptyResponse(Status.INTERNAL_SERVER_ERROR);
+                            }
+                        }
+                    });
 
         } catch (IOException e) {
             return newResultPromise(newEmptyResponse(Status.INTERNAL_SERVER_ERROR));

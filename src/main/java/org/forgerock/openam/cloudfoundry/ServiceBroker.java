@@ -23,8 +23,6 @@ import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.routing.Router;
-import org.forgerock.openam.cloudfoundry.client.HttpClient;
-import org.forgerock.openam.cloudfoundry.client.OpenAMClient;
 import org.forgerock.openam.cloudfoundry.handlers.BindingHandler;
 import org.forgerock.openam.cloudfoundry.handlers.CatalogHandler;
 import org.forgerock.openam.cloudfoundry.handlers.ProvisioningHandler;
@@ -46,18 +44,21 @@ public class ServiceBroker {
      *
      * @param configuration The {@link Configuration} for the underlying {@link OpenAMClient}.
      * @param pwGen The {@link PasswordGenerator} used to generate client passwords.
-     * @throws HttpApplicationException if the underlying {@link OpenAMClient} throws a {@link HttpApplicationException}.
+     * @throws HttpApplicationException if the underlying {@link OpenAMClient} throws a
+     *                                  {@link HttpApplicationException}.
      */
-    public ServiceBroker(HttpClient client, Configuration configuration, PasswordGenerator pwGen) throws HttpApplicationException {
-        OpenAMClient openAMClient = new OpenAMClient(client, configuration);
+    public ServiceBroker(Configuration configuration, PasswordGenerator pwGen)
+            throws HttpApplicationException {
+        OpenAMClient openAMClient = new OpenAMClient(configuration);
         router.addRoute(requestUriMatcher(EQUALS, "/v2/catalog"), new CatalogHandler());
-        router.addRoute(requestUriMatcher(EQUALS, "/v2/service_instances/{instanceId}"), new ProvisioningHandler(openAMClient));
+        router.addRoute(requestUriMatcher(EQUALS, "/v2/service_instances/{instanceId}"),
+                new ProvisioningHandler(openAMClient));
         router.addRoute(requestUriMatcher(EQUALS, "/v2/service_instances/{instanceId}/service_bindings/{bindingId}"),
                 new BindingHandler(openAMClient, pwGen));
     }
 
     /**
-     * Handle the incoming {@link Request}
+     * Handle the incoming {@link Request}.
      *
      * @param context The {@link Context}.
      * @param request The {@link Request}.

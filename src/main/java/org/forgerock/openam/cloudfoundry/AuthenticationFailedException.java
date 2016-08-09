@@ -17,6 +17,7 @@
 package org.forgerock.openam.cloudfoundry;
 
 /**
- * Exception thrown when Authentication against OpenAM fails
+ * Exception thrown when Authentication against OpenAM fails.
  */
-public class AuthenticationFailedException extends Exception { }
+public class AuthenticationFailedException extends Exception {
+}

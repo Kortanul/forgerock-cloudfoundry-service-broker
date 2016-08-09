@@ -20,8 +20,6 @@ import org.forgerock.http.Handler;
 import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
-import org.forgerock.openam.cloudfoundry.client.HttpClientImpl;
-import org.forgerock.openam.cloudfoundry.client.OpenAMClient;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
@@ -33,9 +31,8 @@ import org.forgerock.util.promise.Promise;
  */
 class ServiceBrokerHandler implements Handler {
 
-    private final ServiceBroker broker = new ServiceBroker(new HttpClientImpl(),
-                                                            new ConfigurationEnvironmentReader().read(),
-                                                            new PasswordGenerator());
+    private final ServiceBroker broker = new ServiceBroker(new ConfigurationEnvironmentReader().read(),
+            new PasswordGenerator());
 
     /**
      * Constructs new ServiceBrokerHandler.
