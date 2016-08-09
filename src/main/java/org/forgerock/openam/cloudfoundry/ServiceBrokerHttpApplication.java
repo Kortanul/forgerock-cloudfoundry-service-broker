@@ -20,6 +20,7 @@ import org.forgerock.http.Handler;
 import org.forgerock.http.HttpApplication;
 import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.io.Buffer;
+import org.forgerock.openam.cloudfoundry.handlers.ServiceBrokerHandler;
 import org.forgerock.util.Factory;
 
 /**

@@ -26,6 +26,7 @@ import org.forgerock.http.routing.Router;
 import org.forgerock.openam.cloudfoundry.handlers.BindingHandler;
 import org.forgerock.openam.cloudfoundry.handlers.CatalogHandler;
 import org.forgerock.openam.cloudfoundry.handlers.ProvisioningHandler;
+import org.forgerock.openam.cloudfoundry.handlers.ServiceBrokerHandler;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
