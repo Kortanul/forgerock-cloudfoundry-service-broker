@@ -23,7 +23,7 @@ import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 
 /**
- * Utility class for Responses
+ * Utility class for Responses.
  */
 public final class Responses {
 

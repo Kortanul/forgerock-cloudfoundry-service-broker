@@ -31,7 +31,7 @@ import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 
 /**
- * Handles Catalog calls from Cloud Foundry
+ * Handles Catalog calls from Cloud Foundry.
  */
 public class CatalogHandler implements Handler {
 

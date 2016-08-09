@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.cloudfoundry.client;
+package org.forgerock.openam.cloudfoundry;
 
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
@@ -25,13 +25,13 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.forgerock.http.Client;
 import org.forgerock.http.HttpApplicationException;
+import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.cloudfoundry.AuthenticationFailedException;
-import org.forgerock.openam.cloudfoundry.Configuration;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
@@ -40,13 +40,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Client for OpenAM related operations
+ * Client for OpenAM related operations.
  */
 public class OpenAMClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenAMClient.class);
 
-    private final HttpClient client;
+    private final Client client = new Client(new HttpClientHandler());
     private final Configuration configuration;
     private final String cookieName;
 
@@ -56,8 +56,7 @@ public class OpenAMClient {
      * @param configuration The {@link Configuration} for the client.
      * @throws HttpApplicationException If the client is unable to determine the configured SSOToken cookie name.
      */
-    public OpenAMClient(HttpClient client, Configuration configuration) throws HttpApplicationException {
-        this.client = client;
+    public OpenAMClient(Configuration configuration) throws HttpApplicationException {
         this.configuration = configuration;
         this.cookieName = getCookieName();
     }
@@ -84,7 +83,6 @@ public class OpenAMClient {
                 field("userpassword", password),
                 field("AgentType", "OAuth2Client"),
                 field("com.forgerock.openam.oauth2provider.name", orderedList(username))
-                //field("com.forgerock.openam.oauth2provider.redirectionURIs", orderedList(redirectionUris))
         ));
         final Request createClientRequest = new Request();
         createClientRequest.setEntity(responseBody);
@@ -122,7 +120,8 @@ public class OpenAMClient {
     }
 
     private Promise<Response, NeverThrowsException> getServerInfo() {
-        LOGGER.info("Retrieving OpenAM server info from " + configuration.getOpenAmApiBaseUrl().resolve("serverinfo/*"));
+        LOGGER.info("Retrieving OpenAM server info from "
+                + configuration.getOpenAmApiBaseUrl().resolve("serverinfo/*"));
         return client.send(new Request()
                 .setMethod("GET")
                 .setUri(configuration.getOpenAmApiBaseUrl().resolve("serverinfo/*")));
@@ -145,10 +144,12 @@ public class OpenAMClient {
     }
 
     private Promise<String, AuthenticationFailedException> getOpenAmSession(String username, String password) {
-        LOGGER.info("Creating OpenAM SSO token from " + configuration.getOpenAmApiRealmUrl().resolve("authenticate?authTokenType=module&authIndexValue=Application"));
+        URI authenticateUri = configuration.getOpenAmApiRealmUrl()
+                .resolve("authenticate?authTokenType=module&authIndexValue=Application");
+        LOGGER.info("Creating OpenAM SSO token from " + authenticateUri);
         Request authenticateRequest = new Request();
         authenticateRequest.setMethod("POST");
-        authenticateRequest.setUri(configuration.getOpenAmApiRealmUrl().resolve("authenticate?authTokenType=module&authIndexValue=Application"));
+        authenticateRequest.setUri(authenticateUri);
         authenticateRequest.getHeaders().put("X-OpenAM-Username", username);
         authenticateRequest.getHeaders().put("X-OpenAM-Password", password);
         return client.send(authenticateRequest).then(new Function<Response, String, AuthenticationFailedException>() {
@@ -171,18 +172,20 @@ public class OpenAMClient {
     }
 
     private Promise<Response, NeverThrowsException> sendWithCredentials(final Request request) {
-        return getOpenAmSession(configuration.getUsername(), configuration.getPassword()).thenAsync(new AsyncFunction<String, Response, NeverThrowsException>() {
-            @Override
-            public Promise<Response, NeverThrowsException> apply(String token) throws NeverThrowsException {
-                request.getHeaders().add(cookieName, token);
-                return client.send(request);
-            }
-        }, new AsyncFunction<AuthenticationFailedException, Response, NeverThrowsException>() {
-            @Override
-            public Promise<Response, NeverThrowsException> apply(AuthenticationFailedException exception) throws NeverThrowsException {
-                return newResultPromise(newEmptyResponse(Status.UNAUTHORIZED));
-            }
-        });
+        return getOpenAmSession(configuration.getUsername(), configuration.getPassword())
+                .thenAsync(new AsyncFunction<String, Response, NeverThrowsException>() {
+                    @Override
+                    public Promise<Response, NeverThrowsException> apply(String token) throws NeverThrowsException {
+                        request.getHeaders().add(cookieName, token);
+                        return client.send(request);
+                    }
+                }, new AsyncFunction<AuthenticationFailedException, Response, NeverThrowsException>() {
+                    @Override
+                    public Promise<Response, NeverThrowsException> apply(AuthenticationFailedException exception)
+                            throws NeverThrowsException {
+                        return newResultPromise(newEmptyResponse(Status.UNAUTHORIZED));
+                    }
+                });
     }
 
     private static Response newEmptyResponse(Status status) {

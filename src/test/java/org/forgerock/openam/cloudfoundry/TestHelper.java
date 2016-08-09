@@ -46,8 +46,7 @@ public final class TestHelper {
         ).respond(
                 response()
                         .withBody("{\"cookieName\":\"" + cookieDomain + "\"}")
-                        .withStatusCode(200)
-        );
+                        .withStatusCode(200));
     }
 
     public static void expectSuccessfulAuthentication(ClientAndServer mockServerClient, String ssoToken) {
@@ -58,8 +57,7 @@ public final class TestHelper {
         ).respond(
                 response()
                         .withBody("{\"tokenId\":\"" + ssoToken + "\"}")
-                        .withStatusCode(200)
-        );
+                        .withStatusCode(200));
     }
 
     public static void expectListClients(ClientAndServer mockServerClient, String... clientIds) {
@@ -77,8 +75,7 @@ public final class TestHelper {
         ).respond(
                 response()
                         .withStatusCode(200)
-                        .withBody("{\"result\":[" + StringUtils.join(entries, ",") + "]}")
-        );
+                        .withBody("{\"result\":[" + StringUtils.join(entries, ",") + "]}"));
     }
 
     public static void expectListClientsFailure(ClientAndServer mockServerClient) {
@@ -89,8 +86,7 @@ public final class TestHelper {
                         .withPath("/json/realm/agents")
         ).respond(
                 response()
-                        .withStatusCode(500)
-        );
+                        .withStatusCode(500));
     }
 
     public static void expectClientCreationWithStatus(ClientAndServer mockServerClient, int statusCode) {
@@ -100,8 +96,7 @@ public final class TestHelper {
                         .withPath("/json/realm/agents")
         ).respond(
                 response()
-                        .withStatusCode(statusCode)
-        );
+                        .withStatusCode(statusCode));
     }
 
     public static void expectClientCreation(ClientAndServer mockServerClient) {
@@ -115,8 +110,7 @@ public final class TestHelper {
                         .withPath("/json/realm/agents/" + username)
         ).respond(
                 response()
-                        .withStatusCode(statusCode)
-        );
+                        .withStatusCode(statusCode));
     }
 
     public static HttpRequest verifyServerInfoCall() {
@@ -135,8 +129,7 @@ public final class TestHelper {
                 )
                 .withHeaders(
                         new Header("X-OpenAM-Username", "username"),
-                        new Header("X-OpenAM-Password", "password")
-                );
+                        new Header("X-OpenAM-Password", "password"));
     }
 
     public static HttpRequest verifyListClients(String cookieName, String ssoToken) {
@@ -147,12 +140,15 @@ public final class TestHelper {
                 .withQueryStringParameter(new Parameter("_queryId", "*"));
     }
 
-    public static HttpRequest verifyClientCreation(String username, String generatedPassword, String cookieName, String ssoToken) {
+    public static HttpRequest verifyClientCreation(String username, String generatedPassword, String cookieName,
+            String ssoToken) {
         return request()
                 .withMethod("POST")
                 .withPath("/json/realm/agents")
                 .withQueryStringParameters(new Parameter("_action", "create"))
-                .withBody(exact("{\"username\":\"" + username + "\",\"userpassword\":\"" + generatedPassword + "\",\"AgentType\":\"OAuth2Client\",\"com.forgerock.openam.oauth2provider.name\":[\"[0]=" + username + "\"]}"))
+                .withBody(exact("{\"username\":\"" + username + "\",\"userpassword\":\"" + generatedPassword
+                        + "\",\"AgentType\":\"OAuth2Client\",\"com.forgerock.openam.oauth2provider.name\":[\"[0]="
+                        + username + "\"]}"))
                 .withHeader(new Header(cookieName, ssoToken));
     }
 

@@ -20,7 +20,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.forgerock.openam.cloudfoundry.client.OpenAMClient;
 
 /**
  * An immutable container for the configuration of the broker.
@@ -61,7 +60,7 @@ public final class Configuration {
     }
 
     /**
-     * Returns the OpenAM base URI
+     * Returns the OpenAM base URI.
      * @return The OpenAM base URI
      */
     public URI getOpenAmApiBaseUrl() {
@@ -69,22 +68,28 @@ public final class Configuration {
     }
 
     /**
-     * Returns the OpenAM realm URI
+     * Returns the OpenAM realm URI.
      * @return The OpenAM realm URI
      */
-    public URI getOpenAmApiRealmUrl() { return openAmApiRealmUrl; }
+    public URI getOpenAmApiRealmUrl() {
+        return openAmApiRealmUrl;
+    }
 
     /**
-     * Returns the username used to authenticate against OpenAM
+     * Returns the username used to authenticate against OpenAM.
      * @return The username used to authenticate against OpenAM
      */
-    public String getUsername() { return username; }
+    public String getUsername() {
+        return username;
+    }
 
     /**
-     * Returns the password used to authenticate against OpenAM
+     * Returns the password used to authenticate against OpenAM.
      * @return The password used to authenticate against OpenAM
      */
-    public String getPassword() { return password; }
+    public String getPassword() {
+        return password;
+    }
 
     private String validateProperty(String value, String variableName) {
         if (StringUtils.trimToNull(value) == null) {
@@ -94,7 +99,7 @@ public final class Configuration {
     }
 
     /**
-     * Returns the OpenAM OAuth2 base URI
+     * Returns the OpenAM OAuth2 base URI.
      * @return The OAuth2 URI
      */
     public URI getOpenAmOAuth2Url() {

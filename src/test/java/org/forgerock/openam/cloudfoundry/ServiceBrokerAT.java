@@ -17,15 +17,14 @@
 package org.forgerock.openam.cloudfoundry;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.openam.cloudfoundry.TestHelper.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.forgerock.openam.cloudfoundry.TestHelper.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
-import org.forgerock.openam.cloudfoundry.client.HttpClient;
-import org.forgerock.openam.cloudfoundry.client.HttpClientImpl;
 import org.forgerock.services.context.RootContext;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -112,7 +111,8 @@ public class ServiceBrokerAT {
         assertThat(response.getStatus().getCode(), is(201));
         assertThat(json(response.getEntity().getJson()), hasString("/credentials/username", is(username)));
         assertThat(json(response.getEntity().getJson()), hasString("/credentials/password", is(generatedPassword)));
-        assertThat(json(response.getEntity().getJson()), hasString("/credentials/uri", is("http://localhost:" + mockServerClient.getPort() + "/oauth2/realm/")));
+        assertThat(json(response.getEntity().getJson()), hasString("/credentials/uri", is("http://localhost:"
+                + mockServerClient.getPort() + "/oauth2/realm/")));
 
         mockServerClient.verify(
                 verifyServerInfoCall(),
@@ -383,7 +383,8 @@ public class ServiceBrokerAT {
     }
 
     @Test
-    public void deprovisionReturnsInternalServerErrorWhenRemovingClientFromAMReturnsInternalServerError() throws Exception{
+    public void deprovisionReturnsInternalServerErrorWhenRemovingClientFromAMReturnsInternalServerError()
+            throws Exception {
         expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
         expectSuccessfulAuthentication(mockServerClient, SSO_TOKEN);
         expectListClientsFailure(mockServerClient);
@@ -401,7 +402,8 @@ public class ServiceBrokerAT {
     }
 
     @Test
-    public void deprovisionReturnsInternalServerErrorWhenGettingClientListFromAMReturnsInternalServerError() throws Exception{
+    public void deprovisionReturnsInternalServerErrorWhenGettingClientListFromAMReturnsInternalServerError()
+            throws Exception {
         expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
         expectSuccessfulAuthentication(mockServerClient, SSO_TOKEN);
         expectListClients(mockServerClient, "instanceId-bindingId", "instanceId-bindingId2", "instanceId2-bindingId");
@@ -429,14 +431,13 @@ public class ServiceBrokerAT {
     }
 
     private ServiceBroker getServiceBroker() throws Exception {
-        HttpClient client = new HttpClientImpl();
         Configuration configuration = new Configuration(
                 "http://localhost:" + mockServerClient.getPort(),
                 "username",
                 "password",
                 "/realm");
 
-        return new ServiceBroker(client, configuration, mockPwGen);
+        return new ServiceBroker(configuration, mockPwGen);
     }
 
     private Request createRequest(String method, String path) throws Exception {
