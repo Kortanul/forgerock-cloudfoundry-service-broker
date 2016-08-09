@@ -14,12 +14,16 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.cloudfoundry;
+package org.forgerock.openam.cloudfoundry.handlers;
 
 import org.forgerock.http.Handler;
 import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
+import org.forgerock.openam.cloudfoundry.ConfigurationEnvironmentReader;
+import org.forgerock.openam.cloudfoundry.OpenAMClient;
+import org.forgerock.openam.cloudfoundry.PasswordGenerator;
+import org.forgerock.openam.cloudfoundry.ServiceBroker;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
@@ -29,7 +33,7 @@ import org.forgerock.util.promise.Promise;
  *
  * <p>Delegates to {@link ServiceBroker}.</p>
  */
-class ServiceBrokerHandler implements Handler {
+public class ServiceBrokerHandler implements Handler {
 
     private final ServiceBroker broker = new ServiceBroker(new ConfigurationEnvironmentReader().read(),
             new PasswordGenerator());
@@ -39,7 +43,7 @@ class ServiceBrokerHandler implements Handler {
      *
      * @throws HttpApplicationException if underlying {@link OpenAMClient} throws a {@link HttpApplicationException}.
      */
-    ServiceBrokerHandler() throws HttpApplicationException { }
+    public ServiceBrokerHandler() throws HttpApplicationException { }
 
     @Override
     public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
