@@ -39,7 +39,6 @@ public final class Configuration {
      * @param username the username to use to authenticate against OpenAM
      * @param password the password to use to authenticate against OpenAM
      * @param realm the OpenAM realm to use
-     * @throws URISyntaxException if the OpenAM base URI is not a valid URI
      */
     public Configuration(String baseUri, String username, String password, String realm) {
 
