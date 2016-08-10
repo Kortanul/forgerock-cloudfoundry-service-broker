@@ -24,7 +24,7 @@
     <name>Cloud Foundry Service Broker for OpenAM</name>
     <groupId>org.forgerock</groupId>
     <artifactId>cloudfoundry-service-broker-openam</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2-SNAPSHOT</version>
     <packaging>war</packaging>
     <organization>
         <name>ForgeRock</name>
