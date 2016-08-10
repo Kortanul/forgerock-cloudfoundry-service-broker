@@ -20,4 +20,6 @@ package org.forgerock.openam.cloudfoundry;
  * Exception thrown when Authentication against OpenAM fails.
  */
 public class AuthenticationFailedException extends Exception {
+
+    private static final long serialVersionUID = 42L;
 }
