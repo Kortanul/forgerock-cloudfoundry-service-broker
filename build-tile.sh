@@ -30,6 +30,7 @@ if [ $? -eq 0 ]; then
   fi
 
   cp $BUILD_DIR/product/forgerock-broker*.pivotal $WORKSPACE_DIR/target
+  chmod -R go+w $WORKSPACE_DIR/target
   cd $WORKSPACE_DIR
 
   echo Tidying up
