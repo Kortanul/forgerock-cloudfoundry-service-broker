@@ -3,9 +3,6 @@ Cloud Foundry Broker for OpenAM
 
 The Cloud Foundry Broker allows applications running inside Cloud Foundry to obtain OAuth2 credentials for authentication from an externally hosted OpenAM instance.
 
-###  Warning
-**This code is not supported by ForgeRock and it is your responsibility to verify that the software is suitable and safe for use.**
-
 Prerequisites
 -------------
 
