@@ -28,20 +28,23 @@ public final class Configuration {
 
     private final URI openAmOAuth2Url;
     private final URI openAmApiRealmUrl;
-    private final String username;
-    private final String password;
+    private final String openAmUsername;
+    private final String openAmPassword;
+    private final String brokerUsername;
+    private final String brokerPassword;
     private final URI openAmApiBaseUrl;
 
     /**
      * Constructs a new Configuration.
-     *
-     * @param baseUri the base URI of OpenAM
-     * @param username the username to use to authenticate against OpenAM
-     * @param password the password to use to authenticate against OpenAM
+     *  @param baseUri the base URI of OpenAM
+     * @param openAmUsername the username to use to authenticate against OpenAM
+     * @param openAmPassword the password to use to authenticate against OpenAM
      * @param realm the OpenAM realm to use
+     * @param brokerUsername the username that clients to this broker are required to use.
+     * @param brokerPassword the password that clients to this broker are required to use.
      */
-    public Configuration(String baseUri, String username, String password, String realm) {
-
+    public Configuration(String baseUri, String openAmUsername, String openAmPassword, String realm,
+            String brokerUsername, String brokerPassword) {
         URI openAmBaseUrl;
         try {
             openAmBaseUrl = new URI(validateProperty(baseUri, "OPENAM_BASE_URI") + "/");
@@ -49,8 +52,10 @@ public final class Configuration {
             throw new IllegalStateException("OPENAM_BASE_URI is not a valid URI", e);
         }
 
-        this.username = validateProperty(username, "OPENAM_USERNAME");
-        this.password = validateProperty(password, "OPENAM_PASSWORD");
+        this.openAmUsername = validateProperty(openAmUsername, "OPENAM_USERNAME");
+        this.openAmPassword = validateProperty(openAmPassword, "OPENAM_PASSWORD");
+        this.brokerUsername = validateProperty(brokerUsername, "SECURITY_USER_NAME");
+        this.brokerPassword = validateProperty(brokerPassword, "SECURITY_USER_PASSWORD");
 
         realm = StringUtils.trimToEmpty(realm);
         openAmApiBaseUrl = openAmBaseUrl.resolve("json/");
@@ -78,16 +83,16 @@ public final class Configuration {
      * Returns the username used to authenticate against OpenAM.
      * @return The username used to authenticate against OpenAM
      */
-    public String getUsername() {
-        return username;
+    public String getOpenAmUsername() {
+        return openAmUsername;
     }
 
     /**
      * Returns the password used to authenticate against OpenAM.
      * @return The password used to authenticate against OpenAM
      */
-    public String getPassword() {
-        return password;
+    public String getOpenAmPassword() {
+        return openAmPassword;
     }
 
     private String validateProperty(String value, String variableName) {
@@ -103,5 +108,21 @@ public final class Configuration {
      */
     public URI getOpenAmOAuth2Url() {
         return openAmOAuth2Url;
+    }
+
+    /**
+     * Returns the username that clients to this broker are required to use.
+     * @return a username
+     */
+    public String getBrokerUsername() {
+        return brokerUsername;
+    }
+
+    /**
+     * Returns the password that clients to this broker are required to use.
+     * @return a password
+     */
+    public String getBrokerPassword() {
+        return brokerPassword;
     }
 }

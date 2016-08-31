@@ -35,58 +35,66 @@ public class ConfigurationTest {
 
     @Test
     public void testOAuth2URIWithRootRealm() {
-        config = new Configuration("http://host:port/openam/", "user", "password", "/");
+        config = new Configuration("http://host:port/openam/", "user", "password", "/", "broker_user",
+                "broker_password");
 
         assertThat(config.getOpenAmOAuth2Url().toString(), is("http://host:port/openam/oauth2/"));
     }
 
     @Test
     public void testOAuth2URIWithSubrealm() {
-        config = new Configuration("http://host:port/openam/", "user", "password", "/subrealm");
+        config = new Configuration("http://host:port/openam/", "user", "password", "/subrealm", "broker_user",
+                "broker_password");
 
         assertThat(config.getOpenAmOAuth2Url().toString(), is("http://host:port/openam/oauth2/subrealm/"));
     }
 
     @Test
     public void testRootRealmURI() {
-        config = new Configuration("http://host:port/openam/", "user", "password", "/");
+        config = new Configuration("http://host:port/openam/", "user", "password", "/", "broker_user",
+                "broker_password");
 
         assertThat(config.getOpenAmApiRealmUrl().toString(), is("http://host:port/openam/json/"));
     }
 
     @Test
     public void testMissingSuppliedRealm() {
-        config = new Configuration("http://host:port/openam/", "user", "password", MISSING);
+        config = new Configuration("http://host:port/openam/", "user", "password", MISSING, "broker_user",
+                "broker_password");
 
         assertThat(config.getOpenAmApiRealmUrl().toString(), is("http://host:port/openam/json/"));
     }
 
     @Test
     public void testEmptySuppliedRealm() {
-        config = new Configuration("http://host:port/openam/", "user", "password", EMPTY);
+        config = new Configuration("http://host:port/openam/", "user", "password", EMPTY, "broker_user",
+                "broker_password");
 
         assertThat(config.getOpenAmApiRealmUrl().toString(), is("http://host:port/openam/json/"));
     }
 
     @Test
     public void testRealmURI() {
-        config = new Configuration("http://host:port/openam/", "user", "password", "realm");
+        config = new Configuration("http://host:port/openam/", "user", "password", "realm", "broker_user",
+                "broker_password");
 
         assertThat(config.getOpenAmApiRealmUrl().toString(), is("http://host:port/openam/json/realm/"));
     }
 
     @Test
     public void testUsername() {
-        config = new Configuration("http://host:port/openam/", "user", "password", "realm");
+        config = new Configuration("http://host:port/openam/", "user", "password", "realm", "broker_user",
+                "broker_password");
 
-        assertThat(config.getUsername(), is("user"));
+        assertThat(config.getOpenAmUsername(), is("user"));
     }
 
     @Test
     public void testPassword() {
-        config = new Configuration("http://host:port/openam/", "user", "password", "realm");
+        config = new Configuration("http://host:port/openam/", "user", "password", "realm", "broker_user",
+                "broker_password");
 
-        assertThat(config.getPassword(), is("password"));
+        assertThat(config.getOpenAmPassword(), is("password"));
     }
 
     @Test
@@ -94,7 +102,7 @@ public class ConfigurationTest {
         thrown.expect(IllegalStateException.class);
         thrown.expectMessage("Required configuration missing: OPENAM_BASE_URI");
 
-        config = new Configuration(MISSING, "user", "password", "realm");
+        config = new Configuration(MISSING, "user", "password", "realm", "broker_user", "broker_password");
     }
 
     @Test
@@ -102,7 +110,7 @@ public class ConfigurationTest {
         thrown.expect(IllegalStateException.class);
         thrown.expectMessage("Required configuration missing: OPENAM_BASE_URI");
 
-        config = new Configuration(EMPTY, "user", "password", "realm");
+        config = new Configuration(EMPTY, "user", "password", "realm", "broker_user", "broker_password");
     }
 
     @Test
@@ -110,7 +118,7 @@ public class ConfigurationTest {
         thrown.expect(IllegalStateException.class);
         thrown.expectMessage("OPENAM_BASE_URI is not a valid URI");
 
-        config = new Configuration("not_a\\uri", "user", "password", "realm");
+        config = new Configuration("not_a\\uri", "user", "password", "realm", "broker_user", "broker_password");
     }
 
     @Test
@@ -118,7 +126,8 @@ public class ConfigurationTest {
         thrown.expect(IllegalStateException.class);
         thrown.expectMessage("Required configuration missing: OPENAM_USERNAME");
 
-        config = new Configuration("http://host:port/openam/", MISSING, "password", "realm");
+        config = new Configuration("http://host:port/openam/", MISSING, "password", "realm", "broker_user",
+                "broker_password");
     }
 
     @Test
@@ -126,7 +135,8 @@ public class ConfigurationTest {
         thrown.expect(IllegalStateException.class);
         thrown.expectMessage("Required configuration missing: OPENAM_USERNAME");
 
-        config = new Configuration("http://host:port/openam/", EMPTY, "password", "realm");
+        config = new Configuration("http://host:port/openam/", EMPTY, "password", "realm", "broker_user",
+                "broker_password");
     }
 
     @Test
@@ -134,7 +144,8 @@ public class ConfigurationTest {
         thrown.expect(IllegalStateException.class);
         thrown.expectMessage("Required configuration missing: OPENAM_PASSWORD");
 
-        config = new Configuration("http://host:port/openam/", "user", MISSING, "realm");
+        config = new Configuration("http://host:port/openam/", "user", MISSING, "realm", "broker_user",
+                "broker_password");
     }
 
     @Test
@@ -142,7 +153,8 @@ public class ConfigurationTest {
         thrown.expect(IllegalStateException.class);
         thrown.expectMessage("Required configuration missing: OPENAM_PASSWORD");
 
-        config = new Configuration("http://host:port/openam/", "user", EMPTY, "realm");
+        config = new Configuration("http://host:port/openam/", "user", EMPTY, "realm", "broker_user",
+                "broker_password");
     }
 
 }

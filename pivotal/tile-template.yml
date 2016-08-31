@@ -1,7 +1,7 @@
 ---
 name: forgerock-broker # By convention lowercase with dashes
 icon_file: resources/logo.png
-label: Pivotal Cloud Foundry ForgeRock Broker
+label: ForgeRock Service Broker
 description: Broker for integrating with the ForgeRock identity platform
 
 # Global defaults (all optional)

@@ -23,9 +23,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.nio.charset.StandardCharsets;
+
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.services.context.RootContext;
+import org.forgerock.util.encode.Base64;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -430,12 +433,91 @@ public class ServiceBrokerAT {
         );
     }
 
+    @Test
+    public void getCatalogRequiresAuthorization() throws Exception {
+        expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
+
+        Request request = createRequest("GET", "v2/catalog");
+        request.getHeaders().remove("Authorization");
+
+        Response response = getServiceBroker().handle(new RootContext(), request).get();
+        assertThat(response.getStatus().getCode(), is(401));
+    }
+
+    @Test
+    public void createBindingRequiresAuthorization() throws Exception {
+        expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
+
+        Request request = createRequest("PUT", "v2/service_instances/instanceId/service_bindings/bindingId");
+        request.getHeaders().remove("Authorization");
+
+        Response response = getServiceBroker().handle(new RootContext(), request).get();
+        assertThat(response.getStatus().getCode(), is(401));
+    }
+
+    @Test
+    public void deleteBindingRequiresAuthorization() throws Exception {
+        expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
+
+        Request request = createRequest("DELETE", "v2/service_instances/instanceId/service_bindings/bindingId");
+        request.getHeaders().remove("Authorization");
+
+        Response response = getServiceBroker().handle(new RootContext(), request).get();
+        assertThat(response.getStatus().getCode(), is(401));
+    }
+
+    @Test
+    public void provisioningInstanceRequiresAuthorization() throws Exception {
+        expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
+
+        Request request = createRequest("PUT", "v2/service_instances/instanceId");
+        request.getHeaders().remove("Authorization");
+
+        Response response = getServiceBroker().handle(new RootContext(), request).get();
+        assertThat(response.getStatus().getCode(), is(401));
+    }
+
+    @Test
+    public void deprovisioningInstanceRequiresAuthorization() throws Exception {
+        expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
+
+        Request request = createRequest("DELETE", "v2/service_instances/instanceId");
+        request.getHeaders().remove("Authorization");
+
+        Response response = getServiceBroker().handle(new RootContext(), request).get();
+        assertThat(response.getStatus().getCode(), is(401));
+    }
+
+    @Test
+    public void invalidCredentialsReturns401() throws Exception {
+        expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
+
+        Request request = createRequest("GET", "v2/catalog");
+        request.getHeaders().put("Authorization", createBasicAuth("broker_user", "wrong_password"));
+
+        Response response = getServiceBroker().handle(new RootContext(), request).get();
+        assertThat(response.getStatus().getCode(), is(401));
+    }
+
+    @Test
+    public void invalidAuthTypeReturns401() throws Exception {
+        expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
+
+        Request request = createRequest("GET", "v2/catalog");
+        request.getHeaders().put("Authorization", "Bearer 1234");
+
+        Response response = getServiceBroker().handle(new RootContext(), request).get();
+        assertThat(response.getStatus().getCode(), is(401));
+    }
+
     private ServiceBroker getServiceBroker() throws Exception {
         Configuration configuration = new Configuration(
                 "http://localhost:" + mockServerClient.getPort(),
                 "username",
                 "password",
-                "/realm");
+                "/realm",
+                "broker_user",
+                "broker_password");
 
         return new ServiceBroker(configuration, mockPwGen);
     }
@@ -444,7 +526,11 @@ public class ServiceBrokerAT {
         Request request = new Request();
         request.setMethod(method);
         request.setUri("http://broker.example/" + path);
+        request.getHeaders().put("Authorization", createBasicAuth("broker_user", "broker_password"));
         return request;
     }
 
+    private String createBasicAuth(String username, String password) {
+        return "Basic " + Base64.encode((username + ":" + password).getBytes(StandardCharsets.ISO_8859_1));
+    }
 }

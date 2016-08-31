@@ -62,18 +62,25 @@ Deploying the Cloud Foundry Broker to non-Pivotal Cloud Foundry installations re
     `cd ~/cf-broker`
 3. Push the application to Cloud Foundry:  
     `cf push forgerockbroker-{version}`
-4. Set the required environment variables for the broker:  
-    `cf set-env forgerockbroker-{version} OPENAM_BASE_URI {location}`
-    `cf set-env forgerockbroker-{version} OPENAM_USERNAME {username}`
-    `cf set-env forgerockbroker-{version} OPENAM_PASSWORD {password}`
-    `cf set-env forgerockbroker-{version} OPENAM_REALM {realm}`
+4. Set the required environment variables for the broker:
+   * `cf set-env forgerockbroker-{version} {variable} {value}`
+   
+   | Name                     | Description                                                                                                         |
+   |--------------------------|---------------------------------------------------------------------------------------------------------------------|
+   | `OPENAM_BASE_URI`        | The URI to the OpenAM instance. e.g. `https://sso.my.org/openam/`                                                   |
+   | `OPENAM_USERNAME`        | Username the broker will use to authenticate with OpenAM                                                            |
+   | `OPENAM_PASSWORD`        | Password the broker will use to authenticate with OpenAM                                                            |
+   | `SECURITY_USER_NAME`     | Username that will be used by Cloud Foundry when accessing the broker. You should securely generate a random value. |
+   | `SECURITY_USER_PASSWORD` | Password that will be used by Cloud Foundry when accessing the broker. You should securely generate a random value. |
+   | `OPENAM_REALM`           | Realm to use to authenticate and create the OAuth2 clients. (Optional)                                              |
+   
 5. Restage the application so that changes to the environment variables are applied:  
     `cf restage forgerockbroker-{version}`
 6. Find the URL for the application:  
     `cf app forgerockbroker-{version}`
 7. Create the service broker:  
-    `cf create-service-broker forgerockbroker {cf-username} {cf-password} {url}`  
-   **Note:** The username (`{cf-username}`) and password (`{cf-password}`) specified in this command are for internal use in Cloud Foundry, and should be different from those you created in OpenAM.
+    `cf create-service-broker forgerockbroker {cf-username} {cf-password} {url}`
+   where `{cf-username}` and `{cf-password}` are the same as `SECURITY_USER_NAME` and `SECURITY_USER_PASSWORD`, respectively.
 8. After the service broker has been created, grant access to its service plans:  
     `cf enable-service-access openam-oauth2`
 9. Create the service:  

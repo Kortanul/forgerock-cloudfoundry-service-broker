@@ -19,7 +19,9 @@ package org.forgerock.openam.cloudfoundry;
 import static org.forgerock.http.routing.RouteMatchers.requestUriMatcher;
 import static org.forgerock.http.routing.RoutingMode.EQUALS;
 
+import org.forgerock.http.Handler;
 import org.forgerock.http.HttpApplicationException;
+import org.forgerock.http.handler.Handlers;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.routing.Router;
@@ -38,7 +40,7 @@ import org.forgerock.util.promise.Promise;
  */
 public class ServiceBroker {
 
-    private final Router router = new Router();
+    private final Handler handler;
 
     /**
      * Constructs a new ServiceBroker.
@@ -51,11 +53,13 @@ public class ServiceBroker {
     public ServiceBroker(Configuration configuration, PasswordGenerator pwGen)
             throws HttpApplicationException {
         OpenAMClient openAMClient = new OpenAMClient(configuration);
+        Router router = new Router();
         router.addRoute(requestUriMatcher(EQUALS, "/v2/catalog"), new CatalogHandler());
         router.addRoute(requestUriMatcher(EQUALS, "/v2/service_instances/{instanceId}"),
                 new ProvisioningHandler(openAMClient));
         router.addRoute(requestUriMatcher(EQUALS, "/v2/service_instances/{instanceId}/service_bindings/{bindingId}"),
                 new BindingHandler(openAMClient, pwGen));
+        handler = Handlers.filtered(router, new AuthenticationFilter(configuration));
     }
 
     /**
@@ -66,6 +70,6 @@ public class ServiceBroker {
      * @return A {@link Promise} of a {@link Response}.
      */
     public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
-        return router.handle(context, request);
+        return handler.handle(context, request);
     }
 }

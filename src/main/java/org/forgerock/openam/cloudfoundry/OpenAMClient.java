@@ -172,7 +172,7 @@ public class OpenAMClient {
     }
 
     private Promise<Response, NeverThrowsException> sendWithCredentials(final Request request) {
-        return getOpenAmSession(configuration.getUsername(), configuration.getPassword())
+        return getOpenAmSession(configuration.getOpenAmUsername(), configuration.getOpenAmPassword())
                 .thenAsync(new AsyncFunction<String, Response, NeverThrowsException>() {
                     @Override
                     public Promise<Response, NeverThrowsException> apply(String token) throws NeverThrowsException {

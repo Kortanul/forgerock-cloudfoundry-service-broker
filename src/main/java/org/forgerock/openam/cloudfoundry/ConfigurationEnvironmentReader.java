@@ -30,6 +30,8 @@ public class ConfigurationEnvironmentReader {
                 System.getenv("OPENAM_BASE_URI"),
                 System.getenv("OPENAM_USERNAME"),
                 System.getenv("OPENAM_PASSWORD"),
-                System.getenv("OPENAM_REALM"));
+                System.getenv("OPENAM_REALM"),
+                System.getenv("SECURITY_USER_NAME"),
+                System.getenv("SECURITY_USER_PASSWORD"));
     }
 }
