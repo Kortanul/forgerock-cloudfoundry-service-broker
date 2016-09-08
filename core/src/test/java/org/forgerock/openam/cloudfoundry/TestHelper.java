@@ -146,9 +146,13 @@ public final class TestHelper {
                 .withMethod("POST")
                 .withPath("/json/realm/agents")
                 .withQueryStringParameters(new Parameter("_action", "create"))
-                .withBody(exact("{\"username\":\"" + username + "\",\"userpassword\":\"" + generatedPassword
-                        + "\",\"AgentType\":\"OAuth2Client\",\"com.forgerock.openam.oauth2provider.name\":[\"[0]="
-                        + username + "\"]}"))
+                .withBody(exact("{"
+                        + "\"username\":\"" + username + "\","
+                        + "\"userpassword\":\"" + generatedPassword + "\","
+                        + "\"AgentType\":\"OAuth2Client\","
+                        + "\"com.forgerock.openam.oauth2provider.name\":[\"[0]=" + username + "\"],"
+                        + "\"com.forgerock.openam.oauth2provider.scopes\":[\"[0]=scope1\",\"[1]=scope2\"]"
+                        + "}"))
                 .withHeader(new Header(cookieName, ssoToken));
     }
 

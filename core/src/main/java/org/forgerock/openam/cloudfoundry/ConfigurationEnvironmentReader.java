@@ -32,6 +32,7 @@ public class ConfigurationEnvironmentReader {
                 System.getenv("OPENAM_PASSWORD"),
                 System.getenv("OPENAM_REALM"),
                 System.getenv("SECURITY_USER_NAME"),
-                System.getenv("SECURITY_USER_PASSWORD"));
+                System.getenv("SECURITY_USER_PASSWORD"),
+                System.getenv("OAUTH2_SCOPES"));
     }
 }

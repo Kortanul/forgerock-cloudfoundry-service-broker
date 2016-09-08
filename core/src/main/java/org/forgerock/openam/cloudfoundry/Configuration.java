@@ -18,8 +18,10 @@ package org.forgerock.openam.cloudfoundry;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.forgerock.guava.common.collect.Lists;
 
 /**
  * An immutable container for the configuration of the broker.
@@ -33,6 +35,7 @@ public final class Configuration {
     private final String brokerUsername;
     private final String brokerPassword;
     private final URI openAmApiBaseUrl;
+    private final List<String> scopes;
 
     /**
      * Constructs a new Configuration.
@@ -42,9 +45,10 @@ public final class Configuration {
      * @param realm the OpenAM realm to use
      * @param brokerUsername the username that clients to this broker are required to use.
      * @param brokerPassword the password that clients to this broker are required to use.
+     * @param scopes A space delimited list of scopes that OAuth 2.0 clients will be created with.
      */
     public Configuration(String baseUri, String openAmUsername, String openAmPassword, String realm,
-            String brokerUsername, String brokerPassword) {
+            String brokerUsername, String brokerPassword, String scopes) {
         URI openAmBaseUrl;
         try {
             openAmBaseUrl = new URI(validateProperty(baseUri, "OPENAM_BASE_URI") + "/");
@@ -56,6 +60,7 @@ public final class Configuration {
         this.openAmPassword = validateProperty(openAmPassword, "OPENAM_PASSWORD");
         this.brokerUsername = validateProperty(brokerUsername, "SECURITY_USER_NAME");
         this.brokerPassword = validateProperty(brokerPassword, "SECURITY_USER_PASSWORD");
+        this.scopes = Lists.newArrayList(validateProperty(scopes, "OAUTH2_SCOPES").split(" "));
 
         realm = StringUtils.trimToEmpty(realm);
         openAmApiBaseUrl = openAmBaseUrl.resolve("json/");
@@ -124,5 +129,13 @@ public final class Configuration {
      */
     public String getBrokerPassword() {
         return brokerPassword;
+    }
+
+    /**
+     * Returns the set of supported scopes used when creating OAuth2 clients.
+     * @return a set of scopes
+     */
+    public List<String> getScopes() {
+        return scopes;
     }
 }

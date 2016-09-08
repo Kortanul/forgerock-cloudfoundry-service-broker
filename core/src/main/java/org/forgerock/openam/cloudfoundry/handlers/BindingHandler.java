@@ -23,14 +23,14 @@ import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.io.IOException;
 
+import org.forgerock.openam.cloudfoundry.OpenAMClient;
+import org.forgerock.openam.cloudfoundry.PasswordGenerator;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.cloudfoundry.OpenAMClient;
-import org.forgerock.openam.cloudfoundry.PasswordGenerator;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;

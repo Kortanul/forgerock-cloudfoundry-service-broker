@@ -16,13 +16,13 @@
 
 package org.forgerock.openam.cloudfoundry.handlers;
 
+import org.forgerock.openam.cloudfoundry.ConfigurationEnvironmentReader;
+import org.forgerock.openam.cloudfoundry.OpenAMClient;
+import org.forgerock.openam.cloudfoundry.PasswordGenerator;
 import org.forgerock.http.Handler;
 import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
-import org.forgerock.openam.cloudfoundry.ConfigurationEnvironmentReader;
-import org.forgerock.openam.cloudfoundry.OpenAMClient;
-import org.forgerock.openam.cloudfoundry.PasswordGenerator;
 import org.forgerock.openam.cloudfoundry.ServiceBroker;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.NeverThrowsException;

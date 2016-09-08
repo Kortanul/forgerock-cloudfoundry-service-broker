@@ -82,7 +82,9 @@ public class OpenAMClient {
                 field("username", username),
                 field("userpassword", password),
                 field("AgentType", "OAuth2Client"),
-                field("com.forgerock.openam.oauth2provider.name", orderedList(username))
+                field("com.forgerock.openam.oauth2provider.name", orderedList(username)),
+                field("com.forgerock.openam.oauth2provider.scopes",
+                        orderedList(configuration.getScopes().toArray(new String[0])))
         ));
         final Request createClientRequest = new Request();
         createClientRequest.setEntity(responseBody);
