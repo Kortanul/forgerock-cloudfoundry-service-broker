@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export ARTIFACT_URI=https://maven.forgerock.org/repo/releases/org/forgerock/cloudfoundry-service-broker-openam/
+export ARTIFACT_URI=https://maven.forgerock.org/repo/releases/org/forgerock/openam/cloudfoundry/service-broker-servlet/
 export WORKSPACE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export BUILD_DIR=/tmp/pivotal
 export VERSION=`curl --silent $ARTIFACT_URI | cut -d\" -f2 | grep '[0-9].[0-9].[0-9]' | cut -d/ -f1 | sort -r | head -n1`
@@ -21,7 +21,7 @@ if [ $? -eq 0 ]; then
   sed -e 's/\${version}/'"$VERSION"'/' tile-template.yml > tile.yml
 
   echo Copying Broker artifact from Artifactory
-  curl --silent $ARTIFACT_URI$VERSION/cloudfoundry-service-broker-openam-$VERSION.war -o $BUILD_DIR/resources/forgerock-broker-$VERSION.zip
+  curl --silent $ARTIFACT_URI$VERSION/service-broker-servlet-$VERSION.war -o $BUILD_DIR/resources/forgerock-broker-$VERSION.zip
 
   $BUILD_DIR/tile-generator/bin/tile build $VERSION
 
