@@ -14,11 +14,11 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.cloudfoundry.handlers;
+package org.forgerock.cloudfoundry.handlers;
 
 import static org.forgerock.http.protocol.Status.METHOD_NOT_ALLOWED;
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.openam.cloudfoundry.Responses.newEmptyResponse;
+import static org.forgerock.cloudfoundry.Responses.newEmptyResponse;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import org.forgerock.http.Handler;

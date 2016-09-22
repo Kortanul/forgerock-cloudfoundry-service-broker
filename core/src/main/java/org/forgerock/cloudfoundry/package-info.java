@@ -14,19 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.cloudfoundry;
-
-import java.util.UUID;
-
 /**
- * Securely generates passwords.
+ * OpenAM Cloud Foundry service broker.
  */
-public class PasswordGenerator {
-    /**
-     * Returns a randomly generated password.
-     * @return A randomly generated password.
-     */
-    public String generatePassword() {
-        return UUID.randomUUID().toString();
-    }
-}
+package org.forgerock.cloudfoundry;

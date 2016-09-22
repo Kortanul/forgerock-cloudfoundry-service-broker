@@ -14,7 +14,25 @@
  * Copyright 2016 ForgeRock AS.
  */
 
+package org.forgerock.cloudfoundry;
+
 /**
- * OpenAM Cloud Foundry service broker.
+ * Reads {@link Configuration} properties from the system environment properties.
  */
-package org.forgerock.openam.cloudfoundry;
+public class ConfigurationEnvironmentReader {
+
+    /**
+     * Read the system environment properties into a {@link Configuration} object.
+     * @return A {@link Configuration} object.
+     */
+    public Configuration read() {
+        return new Configuration(
+                System.getenv("OPENAM_BASE_URI"),
+                System.getenv("OPENAM_USERNAME"),
+                System.getenv("OPENAM_PASSWORD"),
+                System.getenv("OPENAM_REALM"),
+                System.getenv("SECURITY_USER_NAME"),
+                System.getenv("SECURITY_USER_PASSWORD"),
+                System.getenv("OAUTH2_SCOPES"));
+    }
+}

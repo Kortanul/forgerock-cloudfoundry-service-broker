@@ -14,12 +14,33 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.cloudfoundry;
+package org.forgerock.cloudfoundry;
+
+import org.forgerock.http.Handler;
+import org.forgerock.http.HttpApplication;
+import org.forgerock.http.HttpApplicationException;
+import org.forgerock.http.io.Buffer;
+import org.forgerock.cloudfoundry.handlers.ServiceBrokerHandler;
+import org.forgerock.util.Factory;
 
 /**
- * Exception thrown when Authentication against OpenAM fails.
+ * The main HTTP Application in the service broker.
+ *
+ * <p>Delegates to the {@link ServiceBrokerHandler}.</p>
  */
-public class AuthenticationFailedException extends Exception {
+public class ServiceBrokerHttpApplication implements HttpApplication {
 
-    private static final long serialVersionUID = 42L;
+    @Override
+    public Handler start() throws HttpApplicationException {
+        return new ServiceBrokerHandler();
+    }
+
+    @Override
+    public Factory<Buffer> getBufferFactory() {
+        return null;
+    }
+
+    @Override
+    public void stop() { }
+
 }

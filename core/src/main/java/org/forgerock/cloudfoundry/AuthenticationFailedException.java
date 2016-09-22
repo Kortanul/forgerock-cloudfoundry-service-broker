@@ -14,7 +14,12 @@
  * Copyright 2016 ForgeRock AS.
  */
 
+package org.forgerock.cloudfoundry;
+
 /**
- * HTTP request handlers.
+ * Exception thrown when Authentication against OpenAM fails.
  */
-package org.forgerock.openam.cloudfoundry.handlers;
+public class AuthenticationFailedException extends Exception {
+
+    private static final long serialVersionUID = 42L;
+}

@@ -14,33 +14,19 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.cloudfoundry;
+package org.forgerock.cloudfoundry;
 
-import org.forgerock.http.Handler;
-import org.forgerock.http.HttpApplication;
-import org.forgerock.http.HttpApplicationException;
-import org.forgerock.http.io.Buffer;
-import org.forgerock.openam.cloudfoundry.handlers.ServiceBrokerHandler;
-import org.forgerock.util.Factory;
+import java.util.UUID;
 
 /**
- * The main HTTP Application in the service broker.
- *
- * <p>Delegates to the {@link ServiceBrokerHandler}.</p>
+ * Securely generates passwords.
  */
-public class ServiceBrokerHttpApplication implements HttpApplication {
-
-    @Override
-    public Handler start() throws HttpApplicationException {
-        return new ServiceBrokerHandler();
+public class PasswordGenerator {
+    /**
+     * Returns a randomly generated password.
+     * @return A randomly generated password.
+     */
+    public String generatePassword() {
+        return UUID.randomUUID().toString();
     }
-
-    @Override
-    public Factory<Buffer> getBufferFactory() {
-        return null;
-    }
-
-    @Override
-    public void stop() { }
-
 }

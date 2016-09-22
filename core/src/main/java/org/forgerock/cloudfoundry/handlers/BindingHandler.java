@@ -14,17 +14,17 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.cloudfoundry.handlers;
+package org.forgerock.cloudfoundry.handlers;
 
 import static org.forgerock.http.protocol.Status.METHOD_NOT_ALLOWED;
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.openam.cloudfoundry.Responses.newEmptyResponse;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.io.IOException;
 
-import org.forgerock.openam.cloudfoundry.OpenAMClient;
-import org.forgerock.openam.cloudfoundry.PasswordGenerator;
+import org.forgerock.cloudfoundry.OpenAMClient;
+import org.forgerock.cloudfoundry.Responses;
+import org.forgerock.cloudfoundry.PasswordGenerator;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
@@ -77,7 +77,7 @@ public class BindingHandler implements Handler {
         case "DELETE":
             return handleDelete(context, request, instanceId, bindingId);
         default:
-            return newResultPromise(newEmptyResponse(METHOD_NOT_ALLOWED));
+            return newResultPromise(Responses.newEmptyResponse(METHOD_NOT_ALLOWED));
         }
     }
 
@@ -89,7 +89,7 @@ public class BindingHandler implements Handler {
             if (!requestBody.get("bind_resource").isDefined("app_guid")) {
                 LOGGER.warn("Unable to create binding for instance " + instanceId
                         + ", app_guid is missing from bind_resource");
-                return newResultPromise(newEmptyResponse(Status.valueOf(422, "Unprocessable Entity"))
+                return newResultPromise(Responses.newEmptyResponse(Status.valueOf(422, "Unprocessable Entity"))
                         .setEntity(json(object(
                             field("error", "RequiresApp"),
                             field("description", "This service supports generation of credentials through binding an "
@@ -105,7 +105,7 @@ public class BindingHandler implements Handler {
                         @Override
                         public Response apply(Response response) throws NeverThrowsException {
                             if (response.getStatus().isSuccessful()) {
-                                return newEmptyResponse(Status.CREATED).setEntity(json(object(
+                                return Responses.newEmptyResponse(Status.CREATED).setEntity(json(object(
                                         field("credentials", object(
                                                 field("uri", openAMClient.getOAuth2Endpoint().toString()),
                                                 field("username", username),
@@ -114,17 +114,17 @@ public class BindingHandler implements Handler {
                                 )));
                             } else if (response.getStatus() == Status.CONFLICT) {
                                 LOGGER.warn("OpenAM already has a binding for " + instanceId + "-" + bindingId);
-                                return newEmptyResponse(Status.CONFLICT);
+                                return Responses.newEmptyResponse(Status.CONFLICT);
                             } else {
                                 LOGGER.error("OpenAM returned an unexpected status (" + response.getStatus().getCode()
                                         + ") creating binding " + instanceId + "-" + bindingId);
-                                return newEmptyResponse(Status.INTERNAL_SERVER_ERROR);
+                                return Responses.newEmptyResponse(Status.INTERNAL_SERVER_ERROR);
                             }
                         }
                     });
 
         } catch (IOException e) {
-            return newResultPromise(newEmptyResponse(Status.INTERNAL_SERVER_ERROR));
+            return newResultPromise(Responses.newEmptyResponse(Status.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -136,10 +136,10 @@ public class BindingHandler implements Handler {
             @Override
             public Response apply(Response response) throws NeverThrowsException {
                 if (response.getStatus().isSuccessful()) {
-                    return newEmptyResponse(Status.OK);
+                    return Responses.newEmptyResponse(Status.OK);
                 } else if (response.getStatus() == Status.BAD_REQUEST) {
                     LOGGER.warn("Binding " + username + " has already been removed");
-                    return newEmptyResponse(Status.GONE);
+                    return Responses.newEmptyResponse(Status.GONE);
                 } else {
                     return response;
                 }

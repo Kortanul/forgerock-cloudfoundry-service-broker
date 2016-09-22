@@ -14,25 +14,25 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.cloudfoundry.handlers;
+package org.forgerock.cloudfoundry.handlers;
 
 import static org.forgerock.http.protocol.Status.METHOD_NOT_ALLOWED;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.openam.cloudfoundry.Responses.newEmptyResponse;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.forgerock.cloudfoundry.OpenAMClient;
+import org.forgerock.cloudfoundry.Responses;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonValue;
-import org.forgerock.openam.cloudfoundry.OpenAMClient;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.Function;
@@ -74,11 +74,11 @@ public class ProvisioningHandler implements Handler {
         case "PUT":
         case "PATCH":
             LOGGER.info("Provisioning instance " + instanceId);
-            return newResultPromise(newEmptyResponse(Status.OK).setEntity(json(object())));
+            return newResultPromise(Responses.newEmptyResponse(Status.OK).setEntity(json(object())));
         case "DELETE":
             return handleDelete(context, request, instanceId);
         default:
-            return newResultPromise(newEmptyResponse(METHOD_NOT_ALLOWED));
+            return newResultPromise(Responses.newEmptyResponse(METHOD_NOT_ALLOWED));
         }
     }
 
@@ -91,13 +91,13 @@ public class ProvisioningHandler implements Handler {
                 if (!response.getStatus().isSuccessful()) {
                     LOGGER.error("OpenAM returned an unexpected status (" + response.getStatus().getCode()
                             + ") retrieving client list for instance " + instanceId);
-                    return newResultPromise(newEmptyResponse(Status.INTERNAL_SERVER_ERROR));
+                    return newResultPromise(Responses.newEmptyResponse(Status.INTERNAL_SERVER_ERROR));
                 }
                 try {
                     return deleteClients(response, instanceId);
                 } catch (IOException e) {
                     LOGGER.error("OpenAM returned unparsable body retrieving client list for instance " + instanceId);
-                    return newResultPromise(newEmptyResponse(Status.INTERNAL_SERVER_ERROR));
+                    return newResultPromise(Responses.newEmptyResponse(Status.INTERNAL_SERVER_ERROR));
                 }
             }
         });
@@ -121,10 +121,10 @@ public class ProvisioningHandler implements Handler {
                     if (!response.getStatus().isSuccessful() && response.getStatus() != Status.BAD_REQUEST) {
                         LOGGER.error("OpenAM returned an unexpected status (" + response.getStatus().getCode()
                                 + ") deleting client for instance " + instanceId);
-                        return newEmptyResponse(Status.INTERNAL_SERVER_ERROR);
+                        return Responses.newEmptyResponse(Status.INTERNAL_SERVER_ERROR);
                     }
                 }
-                return newEmptyResponse(Status.OK);
+                return Responses.newEmptyResponse(Status.OK);
             }
         });
     }

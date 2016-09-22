@@ -13,4 +13,4 @@
 #
 # Copyright 2016 ForgeRock AS.
 #
-org.forgerock.openam.cloudfoundry.ServiceBrokerHttpApplication
+org.forgerock.cloudfoundry.ServiceBrokerHttpApplication

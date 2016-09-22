@@ -14,15 +14,15 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.cloudfoundry;
+package org.forgerock.cloudfoundry;
 
 import static org.forgerock.http.routing.RouteMatchers.requestUriMatcher;
 import static org.forgerock.http.routing.RoutingMode.EQUALS;
 
-import org.forgerock.openam.cloudfoundry.handlers.BindingHandler;
-import org.forgerock.openam.cloudfoundry.handlers.CatalogHandler;
-import org.forgerock.openam.cloudfoundry.handlers.ProvisioningHandler;
-import org.forgerock.openam.cloudfoundry.handlers.ServiceBrokerHandler;
+import org.forgerock.cloudfoundry.handlers.CatalogHandler;
+import org.forgerock.cloudfoundry.handlers.BindingHandler;
+import org.forgerock.cloudfoundry.handlers.ProvisioningHandler;
+import org.forgerock.cloudfoundry.handlers.ServiceBrokerHandler;
 import org.forgerock.http.Handler;
 import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.handler.Handlers;

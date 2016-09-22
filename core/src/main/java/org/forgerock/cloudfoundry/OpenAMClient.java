@@ -14,7 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.cloudfoundry;
+package org.forgerock.cloudfoundry;
 
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;

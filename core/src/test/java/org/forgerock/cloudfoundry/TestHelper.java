@@ -13,7 +13,7 @@
  *
  * Copyright 2016 ForgeRock AS.
  */
-package org.forgerock.openam.cloudfoundry;
+package org.forgerock.cloudfoundry;
 
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;

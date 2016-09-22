@@ -14,25 +14,28 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.openam.cloudfoundry;
+package org.forgerock.cloudfoundry;
+
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+
+import org.forgerock.http.protocol.Response;
+import org.forgerock.http.protocol.Status;
 
 /**
- * Reads {@link Configuration} properties from the system environment properties.
+ * Utility class for Responses.
  */
-public class ConfigurationEnvironmentReader {
+public final class Responses {
+
+    private Responses() { }
 
     /**
-     * Read the system environment properties into a {@link Configuration} object.
-     * @return A {@link Configuration} object.
+     * Constructs a new empty response.
+     *
+     * @param status The {@link Status} of the response.
+     * @return An empty {@link Response} with the specified {@link Status}.
      */
-    public Configuration read() {
-        return new Configuration(
-                System.getenv("OPENAM_BASE_URI"),
-                System.getenv("OPENAM_USERNAME"),
-                System.getenv("OPENAM_PASSWORD"),
-                System.getenv("OPENAM_REALM"),
-                System.getenv("SECURITY_USER_NAME"),
-                System.getenv("SECURITY_USER_PASSWORD"),
-                System.getenv("OAUTH2_SCOPES"));
+    public static Response newEmptyResponse(Status status) {
+        return new Response(status).setEntity(json(object()));
     }
 }
