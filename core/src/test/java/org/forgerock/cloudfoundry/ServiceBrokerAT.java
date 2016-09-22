@@ -62,29 +62,17 @@ public class ServiceBrokerAT {
 
     @Test
     public void getCatalogRespondsWithCatalog() throws Exception {
-        TestHelper.expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
-
         Request request = createRequest("GET", "v2/catalog");
         Response response = getServiceBroker().handle(new RootContext(), request).get();
         assertThat(response.getStatus().getCode(), is(200));
         assertThat(json(response.getEntity().getJson()), TestHelper.hasString("/services/0/name", is("openam-oauth2")));
-
-        mockServerClient.verify(
-                TestHelper.verifyServerInfoCall()
-        );
     }
 
     @Test
     public void nonGetHttpVerbOnCatalogReturnsNotSupported() throws Exception {
-        TestHelper.expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
-
         Request request = createRequest("PUT", "v2/catalog");
         Response response = getServiceBroker().handle(new RootContext(), request).get();
         assertThat(response.getStatus().getCode(), is(405));
-
-        mockServerClient.verify(
-                TestHelper.verifyServerInfoCall()
-        );
     }
 
     @Test
@@ -118,8 +106,8 @@ public class ServiceBrokerAT {
                 + mockServerClient.getPort() + "/oauth2/realm/")));
 
         mockServerClient.verify(
-                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifySuccessfulAuthentication(),
+                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifyClientCreation(username, generatedPassword, COOKIE_DOMAIN, SSO_TOKEN)
         );
     }
@@ -128,8 +116,6 @@ public class ServiceBrokerAT {
     public void createBindingWithMalformedBodyReturnsUnprocessableEntity() throws Exception {
         String instanceId = "instanceId";
         String bindingId = "bindingId";
-
-        TestHelper.expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
 
         Request request = createRequest("PUT", "v2/service_instances/" + instanceId + "/service_bindings/" + bindingId);
         request.setEntity(json(object(
@@ -141,10 +127,6 @@ public class ServiceBrokerAT {
 
         Response response = getServiceBroker().handle(new RootContext(), request).get();
         assertThat(response.getStatus().getCode(), is(422));
-
-        mockServerClient.verify(
-                TestHelper.verifyServerInfoCall()
-        );
     }
 
     @Test
@@ -173,8 +155,8 @@ public class ServiceBrokerAT {
         assertThat(response.getStatus().getCode(), is(409));
 
         mockServerClient.verify(
-                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifySuccessfulAuthentication(),
+                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifyClientCreation(username, generatedPassword, COOKIE_DOMAIN, SSO_TOKEN)
         );
     }
@@ -205,8 +187,8 @@ public class ServiceBrokerAT {
         assertThat(response.getStatus().getCode(), is(500));
 
         mockServerClient.verify(
-                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifySuccessfulAuthentication(),
+                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifyClientCreation(username, generatedPassword, COOKIE_DOMAIN, SSO_TOKEN)
         );
     }
@@ -223,8 +205,8 @@ public class ServiceBrokerAT {
         assertThat(response.getStatus().getCode(), is(200));
 
         mockServerClient.verify(
-                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifySuccessfulAuthentication(),
+                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifyClientDeletion("instanceId-bindingId", COOKIE_DOMAIN, SSO_TOKEN)
         );
     }
@@ -241,38 +223,26 @@ public class ServiceBrokerAT {
         assertThat(response.getStatus().getCode(), is(410));
 
         mockServerClient.verify(
-                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifySuccessfulAuthentication(),
+                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifyClientDeletion("instanceId-bindingId", COOKIE_DOMAIN, SSO_TOKEN)
         );
     }
 
     @Test
     public void nonPutOrDeleteHttpVerbOnBindingReturnsNotSupported() throws Exception {
-        TestHelper.expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
-
         Request request = createRequest("POST", "v2/service_instances/instanceId/service_bindings/bindingId");
 
         Response response = getServiceBroker().handle(new RootContext(), request).get();
         assertThat(response.getStatus().getCode(), is(405));
-
-        mockServerClient.verify(
-                TestHelper.verifyServerInfoCall()
-        );
     }
 
     @Test
     public void provisioningInstanceWithPut() throws Exception {
-        TestHelper.expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
-
         Request request = createRequest("PUT", "v2/service_instances/instanceId");
 
         Response response = getServiceBroker().handle(new RootContext(), request).get();
         assertThat(response.getStatus().getCode(), is(200));
-
-        mockServerClient.verify(
-                TestHelper.verifyServerInfoCall()
-        );
     }
 
     @Test
@@ -297,8 +267,8 @@ public class ServiceBrokerAT {
         assertThat(response.getStatus().getCode(), is(200));
 
         mockServerClient.verify(
-                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifySuccessfulAuthentication(),
+                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifyListClients(COOKIE_DOMAIN, SSO_TOKEN)
         );
     }
@@ -316,8 +286,8 @@ public class ServiceBrokerAT {
         assertThat(response.getStatus().getCode(), is(200));
 
         mockServerClient.verify(
-                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifySuccessfulAuthentication(),
+                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifyListClients(COOKIE_DOMAIN, SSO_TOKEN),
                 TestHelper.verifyClientDeletion("instanceId-bindingId", COOKIE_DOMAIN, SSO_TOKEN)
         );
@@ -336,8 +306,8 @@ public class ServiceBrokerAT {
         assertThat(response.getStatus().getCode(), is(200));
 
         mockServerClient.verify(
-                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifySuccessfulAuthentication(),
+                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifyListClients(COOKIE_DOMAIN, SSO_TOKEN),
                 TestHelper.verifyClientDeletion("instanceId-bindingId", COOKIE_DOMAIN, SSO_TOKEN)
         );
@@ -358,8 +328,8 @@ public class ServiceBrokerAT {
         assertThat(response.getStatus().getCode(), is(200));
 
         mockServerClient.verify(
-                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifySuccessfulAuthentication(),
+                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifyListClients(COOKIE_DOMAIN, SSO_TOKEN)
         );
 
@@ -376,16 +346,10 @@ public class ServiceBrokerAT {
 
     @Test
     public void nonPutPatchOrDeleteHttpVerbOnProvisioningReturnsNotSupported() throws Exception {
-        TestHelper.expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
-
         Request request = createRequest("POST", "v2/service_instances/instanceId");
 
         Response response = getServiceBroker().handle(new RootContext(), request).get();
         assertThat(response.getStatus().getCode(), is(405));
-
-        mockServerClient.verify(
-                TestHelper.verifyServerInfoCall()
-        );
     }
 
     @Test
@@ -401,8 +365,8 @@ public class ServiceBrokerAT {
         assertThat(response.getStatus().getCode(), is(500));
 
         mockServerClient.verify(
-                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifySuccessfulAuthentication(),
+                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifyListClients(COOKIE_DOMAIN, SSO_TOKEN)
         );
     }
@@ -423,8 +387,8 @@ public class ServiceBrokerAT {
         assertThat(response.getStatus().getCode(), is(500));
 
         mockServerClient.verify(
-                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifySuccessfulAuthentication(),
+                TestHelper.verifyServerInfoCall(),
                 TestHelper.verifyListClients(COOKIE_DOMAIN, SSO_TOKEN)
         );
 

@@ -16,11 +16,10 @@
 
 package org.forgerock.cloudfoundry;
 
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +47,7 @@ public class OpenAMClient {
 
     private final Client client = new Client(new HttpClientHandler());
     private final Configuration configuration;
-    private final String cookieName;
+    private String cookieName;
 
     /**
      * Constructs a new OpenAM client.
@@ -58,7 +57,6 @@ public class OpenAMClient {
      */
     public OpenAMClient(Configuration configuration) throws HttpApplicationException {
         this.configuration = configuration;
-        this.cookieName = getCookieName();
     }
 
     /**
@@ -89,6 +87,7 @@ public class OpenAMClient {
         final Request createClientRequest = new Request();
         createClientRequest.setEntity(responseBody);
         createClientRequest.setMethod("POST");
+        createClientRequest.getHeaders().put("Accept-API-Version", "protocol=1.0, resource=3.0");
         createClientRequest.setUri(configuration.getOpenAmApiRealmUrl().resolve("agents?_action=create"));
 
         return sendWithCredentials(createClientRequest);
@@ -104,6 +103,7 @@ public class OpenAMClient {
         LOGGER.info("Deleting OAuth2 client " + username);
         final Request request = new Request();
         request.setMethod("DELETE");
+        request.getHeaders().put("Accept-API-Version", "protocol=1.0, resource=3.0");
         request.setUri(configuration.getOpenAmApiRealmUrl().resolve("agents/" + username));
         return sendWithCredentials(request);
     }
@@ -116,6 +116,7 @@ public class OpenAMClient {
         LOGGER.info("Retrieving list of OAuth2 clients");
         final Request queryClientRequest = new Request();
         queryClientRequest.setMethod("GET");
+        queryClientRequest.getHeaders().put("Accept-API-Version", "protocol=1.0, resource=3.0");
         queryClientRequest.setUri(configuration.getOpenAmApiRealmUrl().resolve("agents?_queryId=*"));
 
         return sendWithCredentials(queryClientRequest);
@@ -124,24 +125,39 @@ public class OpenAMClient {
     private Promise<Response, NeverThrowsException> getServerInfo() {
         LOGGER.info("Retrieving OpenAM server info from "
                 + configuration.getOpenAmApiBaseUrl().resolve("serverinfo/*"));
-        return client.send(new Request()
-                .setMethod("GET")
-                .setUri(configuration.getOpenAmApiBaseUrl().resolve("serverinfo/*")));
+        Request request = new Request();
+        request.setMethod("GET");
+        request.getHeaders().put("Accept-API-Version", "protocol=1.0, resource=1.1");
+        request.setUri(configuration.getOpenAmApiBaseUrl().resolve("serverinfo/*"));
+        return client.send(request);
     }
 
-    private String getCookieName() throws HttpApplicationException {
+    private Promise<String, HttpApplicationException> getCookieName() {
         LOGGER.info("Determining OpenAM SSO token cookie name");
-        try {
-            final Response response = getServerInfo().get();
-            final String cookieName = json(response.getEntity().getJson()).get("cookieName").asString();
-            if (cookieName != null) {
-                LOGGER.info("SSO token cookie name is " + cookieName);
-                return cookieName;
-            } else {
-                throw new HttpApplicationException("Unable to resolve cookie name");
-            }
-        } catch (Exception e) {
-            throw new HttpApplicationException("Unable to resolve cookie name", e);
+        if (cookieName != null) {
+            return newResultPromise(cookieName);
+        } else {
+            return getServerInfo().then(new Function<Response, String, HttpApplicationException>() {
+                @Override
+                public String apply(Response response) throws HttpApplicationException {
+                    try {
+                        cookieName = json(response.getEntity().getJson()).get("cookieName").asString();
+                        if (cookieName != null) {
+                            LOGGER.info("SSO token cookie name is " + cookieName);
+                            return cookieName;
+                        } else {
+                            throw new HttpApplicationException("Unable to resolve cookie name");
+                        }
+                    } catch (IOException e) {
+                        throw new HttpApplicationException("Unable to resolve cookie name");
+                    }
+                }
+            }, new Function<NeverThrowsException, String, HttpApplicationException>() {
+                @Override
+                public String apply(NeverThrowsException value) throws HttpApplicationException {
+                    throw new HttpApplicationException("Unable to resolve cookie name");
+                }
+            });
         }
     }
 
@@ -177,9 +193,22 @@ public class OpenAMClient {
         return getOpenAmSession(configuration.getOpenAmUsername(), configuration.getOpenAmPassword())
                 .thenAsync(new AsyncFunction<String, Response, NeverThrowsException>() {
                     @Override
-                    public Promise<Response, NeverThrowsException> apply(String token) throws NeverThrowsException {
-                        request.getHeaders().add(cookieName, token);
-                        return client.send(request);
+                    public Promise<Response, NeverThrowsException> apply(final String token)
+                            throws NeverThrowsException {
+                        return getCookieName().thenAsync(new AsyncFunction<String, Response, NeverThrowsException>() {
+                            @Override
+                            public Promise<? extends Response, ? extends NeverThrowsException> apply(String cookieName)
+                                    throws NeverThrowsException {
+                                request.getHeaders().add(cookieName, token);
+                                return client.send(request);
+                            }
+                        }, new AsyncFunction<HttpApplicationException, Response, NeverThrowsException>() {
+                            @Override
+                            public Promise<Response, NeverThrowsException> apply(HttpApplicationException exception)
+                                    throws NeverThrowsException {
+                                return newResultPromise(newEmptyResponse(Status.INTERNAL_SERVER_ERROR));
+                            }
+                        });
                     }
                 }, new AsyncFunction<AuthenticationFailedException, Response, NeverThrowsException>() {
                     @Override
