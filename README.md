@@ -21,7 +21,7 @@ Use the following steps to create user credentials in OpenAM that allow the Clou
 7.  Click the created user, and then select the _Group_ tab.
 8.  In the _Available_ list box, select the group you created earlier, click **Add**, and then click **Save**.
 9.  Click **Back to Subjects**.
-10. On the _Subjects_ tab, select the group you created earlier, and then select **Read and write access to all configured Agents**.
+10. On the _Privileges_ tab, select the group you created earlier, and then select **Read and write access to all configured Agents**.
 11. Save your changes.
 
 Deploying the Cloud Foundry Broker
