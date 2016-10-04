@@ -28,7 +28,7 @@
     <name>Cloud Foundry Service Broker for OpenAM</name>
     <groupId>org.forgerock.cloudfoundry</groupId>
     <artifactId>service-broker</artifactId>
-    <version>1.0.10</version>
+    <version>1.0.11-SNAPSHOT</version>
     <packaging>pom</packaging>
     <organization>
         <name>ForgeRock</name>
@@ -95,7 +95,7 @@
         <connection>scm:git:ssh://git@stash.forgerock.org:7999/cloud/cloudfoundry-service-broker-openam.git</connection>
         <developerConnection>scm:git:ssh://git@stash.forgerock.org:7999/cloud/cloudfoundry-service-broker-openam.git</developerConnection>
         <url>https://stash.forgerock.org/projects/CLOUD/repos/cloudfoundry-service-broker-openam/browse</url>
-        <tag>1.0.10</tag>
+        <tag>1.0.0</tag>
     </scm>
 
     <dependencyManagement>
