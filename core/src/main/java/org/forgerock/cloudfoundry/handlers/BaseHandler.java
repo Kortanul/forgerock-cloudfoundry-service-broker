@@ -16,6 +16,7 @@
 
 package org.forgerock.cloudfoundry.handlers;
 
+import static org.forgerock.cloudfoundry.Responses.newEmptyJsonResponse;
 import static org.forgerock.http.protocol.Responses.newInternalServerError;
 import static org.forgerock.http.protocol.Status.INTERNAL_SERVER_ERROR;
 import static org.forgerock.http.protocol.Status.METHOD_NOT_ALLOWED;
@@ -30,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.forgerock.cloudfoundry.Responses;
 import org.forgerock.cloudfoundry.services.Service;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
@@ -54,7 +54,7 @@ abstract class BaseHandler implements Handler {
     public final Promise<Response, NeverThrowsException> handle(Context context, Request request) {
         String method = request.getMethod();
         if (!allowedMethods.contains(method)) {
-            return newResultPromise(Responses.newEmptyResponse(METHOD_NOT_ALLOWED));
+            return newResultPromise(newEmptyJsonResponse(METHOD_NOT_ALLOWED));
         }
 
         try {

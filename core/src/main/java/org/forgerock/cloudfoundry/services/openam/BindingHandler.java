@@ -16,6 +16,7 @@
 
 package org.forgerock.cloudfoundry.services.openam;
 
+import static org.forgerock.cloudfoundry.Responses.newEmptyJsonResponse;
 import static org.forgerock.http.protocol.Status.METHOD_NOT_ALLOWED;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
@@ -27,7 +28,6 @@ import java.util.Map;
 
 import org.forgerock.cloudfoundry.OpenAMClient;
 import org.forgerock.cloudfoundry.PasswordGenerator;
-import org.forgerock.cloudfoundry.Responses;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
@@ -81,7 +81,7 @@ class BindingHandler implements Handler {
         case "DELETE":
             return handleDelete(context, request, instanceId, bindingId);
         default:
-            return newResultPromise(Responses.newEmptyResponse(METHOD_NOT_ALLOWED));
+            return newResultPromise(newEmptyJsonResponse(METHOD_NOT_ALLOWED));
         }
     }
 
@@ -93,7 +93,7 @@ class BindingHandler implements Handler {
             if (!requestBody.get("bind_resource").isDefined("app_guid")) {
                 LOGGER.warn("Unable to create binding for instance " + instanceId
                         + ", app_guid is missing from bind_resource");
-                return newResultPromise(Responses.newEmptyResponse(Status.valueOf(422, "Unprocessable Entity"))
+                return newResultPromise(newEmptyJsonResponse(Status.valueOf(422, "Unprocessable Entity"))
                         .setEntity(json(object(
                             field("error", "RequiresApp"),
                             field("description", "This service supports generation of credentials through binding an "
@@ -109,7 +109,7 @@ class BindingHandler implements Handler {
                         @Override
                         public Response apply(Response response) throws NeverThrowsException {
                             if (response.getStatus().isSuccessful()) {
-                                return Responses.newEmptyResponse(Status.CREATED).setEntity(json(object(
+                                return new Response(Status.CREATED).setEntity(json(object(
                                         field("credentials", object(
                                                 field("uri", openAMClient.getOAuth2Endpoint().toString()),
                                                 field("username", username),
@@ -118,17 +118,17 @@ class BindingHandler implements Handler {
                                 )));
                             } else if (response.getStatus() == Status.CONFLICT) {
                                 LOGGER.warn("OpenAM already has a binding for " + instanceId + "-" + bindingId);
-                                return Responses.newEmptyResponse(Status.CONFLICT);
+                                return newEmptyJsonResponse(Status.CONFLICT);
                             } else {
                                 LOGGER.error("OpenAM returned an unexpected status (" + response.getStatus().getCode()
                                         + ") creating binding " + instanceId + "-" + bindingId);
-                                return Responses.newEmptyResponse(Status.INTERNAL_SERVER_ERROR);
+                                return newEmptyJsonResponse(Status.INTERNAL_SERVER_ERROR);
                             }
                         }
                     });
 
         } catch (IOException e) {
-            return newResultPromise(Responses.newEmptyResponse(Status.INTERNAL_SERVER_ERROR));
+            return newResultPromise(newEmptyJsonResponse(Status.INTERNAL_SERVER_ERROR));
         }
     }
 
@@ -140,10 +140,10 @@ class BindingHandler implements Handler {
             @Override
             public Response apply(Response response) throws NeverThrowsException {
                 if (response.getStatus().isSuccessful()) {
-                    return Responses.newEmptyResponse(Status.OK);
+                    return newEmptyJsonResponse(Status.OK);
                 } else if (response.getStatus() == Status.BAD_REQUEST) {
                     LOGGER.warn("Binding " + username + " has already been removed");
-                    return Responses.newEmptyResponse(Status.GONE);
+                    return newEmptyJsonResponse(Status.GONE);
                 } else {
                     return response;
                 }

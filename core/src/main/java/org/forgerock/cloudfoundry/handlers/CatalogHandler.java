@@ -16,8 +16,7 @@
 
 package org.forgerock.cloudfoundry.handlers;
 
-import static org.forgerock.cloudfoundry.Responses.newEmptyResponse;
-import static org.forgerock.http.protocol.Status.METHOD_NOT_ALLOWED;
+import static org.forgerock.cloudfoundry.Responses.newEmptyJsonResponse;
 import static org.forgerock.json.JsonValue.array;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
@@ -63,7 +62,7 @@ public class CatalogHandler implements Handler {
     public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
         // Only GET is allowed
         if (!"GET".equals(request.getMethod())) {
-            return newResultPromise(newEmptyResponse(METHOD_NOT_ALLOWED));
+            return newResultPromise(newEmptyJsonResponse(Status.METHOD_NOT_ALLOWED));
         }
 
         List<Object> arrayServices = array();
@@ -72,6 +71,6 @@ public class CatalogHandler implements Handler {
         }
         JsonValue result = json(object(field("services", arrayServices)));
 
-        return newResultPromise(newEmptyResponse(Status.OK).setEntity(result));
+        return newResultPromise(new Response(Status.OK).setEntity(result));
     }
 }

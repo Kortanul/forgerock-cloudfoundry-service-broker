@@ -16,6 +16,7 @@
 
 package org.forgerock.cloudfoundry;
 
+import static org.forgerock.cloudfoundry.Responses.newEmptyJsonResponse;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
@@ -206,7 +207,7 @@ public class OpenAMClient {
                             @Override
                             public Promise<Response, NeverThrowsException> apply(HttpApplicationException exception)
                                     throws NeverThrowsException {
-                                return newResultPromise(newEmptyResponse(Status.INTERNAL_SERVER_ERROR));
+                                return newResultPromise(newEmptyJsonResponse(Status.INTERNAL_SERVER_ERROR));
                             }
                         });
                     }
@@ -214,13 +215,9 @@ public class OpenAMClient {
                     @Override
                     public Promise<Response, NeverThrowsException> apply(AuthenticationFailedException exception)
                             throws NeverThrowsException {
-                        return newResultPromise(newEmptyResponse(Status.UNAUTHORIZED));
+                        return newResultPromise(newEmptyJsonResponse(Status.UNAUTHORIZED));
                     }
                 });
-    }
-
-    private static Response newEmptyResponse(Status status) {
-        return new Response(status).setEntity(json(object()));
     }
 
     private static List<String> orderedList(String... values) {
