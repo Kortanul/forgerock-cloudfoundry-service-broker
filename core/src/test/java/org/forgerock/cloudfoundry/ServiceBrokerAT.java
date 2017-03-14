@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import java.nio.charset.StandardCharsets;
 
+import org.forgerock.cloudfoundry.services.openam.OpenAMOAuth2Service;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.services.context.RootContext;
@@ -89,7 +90,7 @@ public class ServiceBrokerAT {
 
         Request request = createRequest("PUT", "v2/service_instances/" + instanceId + "/service_bindings/" + bindingId);
         request.setEntity(json(object(
-                field("service_id", "serviceId"),
+                field("service_id", OpenAMOAuth2Service.SERVICE_ID),
                 field("plan_id", "planId"),
                 field("app_guid", "appGuid"),
                 field("bind_resource", object(
@@ -119,7 +120,7 @@ public class ServiceBrokerAT {
 
         Request request = createRequest("PUT", "v2/service_instances/" + instanceId + "/service_bindings/" + bindingId);
         request.setEntity(json(object(
-                field("service_id", "serviceId"),
+                field("service_id", OpenAMOAuth2Service.SERVICE_ID),
                 field("plan_id", "planId"),
                 field("app_guid", "appGuid"),
                 field("bind_resource", object())
@@ -143,7 +144,7 @@ public class ServiceBrokerAT {
 
         Request request = createRequest("PUT", "v2/service_instances/" + instanceId + "/service_bindings/" + bindingId);
         request.setEntity(json(object(
-                field("service_id", "serviceId"),
+                field("service_id", OpenAMOAuth2Service.SERVICE_ID),
                 field("plan_id", "planId"),
                 field("app_guid", "appGuid"),
                 field("bind_resource", object(
@@ -175,7 +176,7 @@ public class ServiceBrokerAT {
 
         Request request = createRequest("PUT", "v2/service_instances/" + instanceId + "/service_bindings/" + bindingId);
         request.setEntity(json(object(
-                field("service_id", "serviceId"),
+                field("service_id", OpenAMOAuth2Service.SERVICE_ID),
                 field("plan_id", "planId"),
                 field("app_guid", "appGuid"),
                 field("bind_resource", object(
@@ -200,6 +201,10 @@ public class ServiceBrokerAT {
         TestHelper.expectClientDeletion(mockServerClient, "instanceId-bindingId", 200);
 
         Request request = createRequest("DELETE", "v2/service_instances/instanceId/service_bindings/bindingId");
+        request.setEntity(json(object(
+                field("service_id", OpenAMOAuth2Service.SERVICE_ID),
+                field("plan_id", "planId")
+        )));
 
         Response response = getServiceBroker().handle(new RootContext(), request).get();
         assertThat(response.getStatus().getCode(), is(200));
@@ -212,12 +217,16 @@ public class ServiceBrokerAT {
     }
 
     @Test
-    public void deleteBindingWhichDoesntExistReturnsGone() throws Exception {
+    public void deleteBindingWhichDoesNotExistReturnsGone() throws Exception {
         TestHelper.expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
         TestHelper.expectSuccessfulAuthentication(mockServerClient, SSO_TOKEN);
         TestHelper.expectClientDeletion(mockServerClient, "instanceId-bindingId", 400);
 
         Request request = createRequest("DELETE", "v2/service_instances/instanceId/service_bindings/bindingId");
+        request.setEntity(json(object(
+                field("service_id", OpenAMOAuth2Service.SERVICE_ID),
+                field("plan_id", "planId")
+        )));
 
         Response response = getServiceBroker().handle(new RootContext(), request).get();
         assertThat(response.getStatus().getCode(), is(410));
@@ -240,6 +249,10 @@ public class ServiceBrokerAT {
     @Test
     public void provisioningInstanceWithPut() throws Exception {
         Request request = createRequest("PUT", "v2/service_instances/instanceId");
+        request.setEntity(json(object(
+                field("service_id", OpenAMOAuth2Service.SERVICE_ID),
+                field("plan_id", "planId")
+        )));
 
         Response response = getServiceBroker().handle(new RootContext(), request).get();
         assertThat(response.getStatus().getCode(), is(200));
@@ -250,6 +263,10 @@ public class ServiceBrokerAT {
         TestHelper.expectServerInfoCall(mockServerClient, COOKIE_DOMAIN);
 
         Request request = createRequest("PATCH", "v2/service_instances/instanceId");
+        request.setEntity(json(object(
+                field("service_id", OpenAMOAuth2Service.SERVICE_ID),
+                field("plan_id", "planId")
+        )));
 
         Response response = getServiceBroker().handle(new RootContext(), request).get();
         assertThat(response.getStatus().getCode(), is(200));
@@ -262,6 +279,10 @@ public class ServiceBrokerAT {
         TestHelper.expectListClients(mockServerClient);
 
         Request request = createRequest("DELETE", "v2/service_instances/instanceId");
+        request.setEntity(json(object(
+                field("service_id", OpenAMOAuth2Service.SERVICE_ID),
+                field("plan_id", "planId")
+        )));
 
         Response response = getServiceBroker().handle(new RootContext(), request).get();
         assertThat(response.getStatus().getCode(), is(200));
@@ -281,6 +302,10 @@ public class ServiceBrokerAT {
         TestHelper.expectClientDeletion(mockServerClient, "instanceId-bindingId", 201);
 
         Request request = createRequest("DELETE", "v2/service_instances/instanceId");
+        request.setEntity(json(object(
+                field("service_id", OpenAMOAuth2Service.SERVICE_ID),
+                field("plan_id", "planId")
+        )));
 
         Response response = getServiceBroker().handle(new RootContext(), request).get();
         assertThat(response.getStatus().getCode(), is(200));
@@ -301,6 +326,10 @@ public class ServiceBrokerAT {
         TestHelper.expectClientDeletion(mockServerClient, "instanceId-bindingId", 400);
 
         Request request = createRequest("DELETE", "v2/service_instances/instanceId");
+        request.setEntity(json(object(
+                field("service_id", OpenAMOAuth2Service.SERVICE_ID),
+                field("plan_id", "planId")
+        )));
 
         Response response = getServiceBroker().handle(new RootContext(), request).get();
         assertThat(response.getStatus().getCode(), is(200));
@@ -323,6 +352,10 @@ public class ServiceBrokerAT {
         TestHelper.expectClientDeletion(mockServerClient, "instanceId-bindingId2", 201);
 
         Request request = createRequest("DELETE", "v2/service_instances/instanceId");
+        request.setEntity(json(object(
+                field("service_id", OpenAMOAuth2Service.SERVICE_ID),
+                field("plan_id", "planId")
+        )));
 
         Response response = getServiceBroker().handle(new RootContext(), request).get();
         assertThat(response.getStatus().getCode(), is(200));
@@ -360,6 +393,10 @@ public class ServiceBrokerAT {
         TestHelper.expectListClientsFailure(mockServerClient);
 
         Request request = createRequest("DELETE", "v2/service_instances/instanceId");
+        request.setEntity(json(object(
+                field("service_id", OpenAMOAuth2Service.SERVICE_ID),
+                field("plan_id", "planId")
+        )));
 
         Response response = getServiceBroker().handle(new RootContext(), request).get();
         assertThat(response.getStatus().getCode(), is(500));
@@ -382,6 +419,10 @@ public class ServiceBrokerAT {
         TestHelper.expectClientDeletion(mockServerClient, "instanceId-bindingId2", 500);
 
         Request request = createRequest("DELETE", "v2/service_instances/instanceId");
+        request.setEntity(json(object(
+                field("service_id", OpenAMOAuth2Service.SERVICE_ID),
+                field("plan_id", "planId")
+        )));
 
         Response response = getServiceBroker().handle(new RootContext(), request).get();
         assertThat(response.getStatus().getCode(), is(500));

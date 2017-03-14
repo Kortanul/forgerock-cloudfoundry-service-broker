@@ -16,11 +16,16 @@
 
 package org.forgerock.cloudfoundry.handlers;
 
-import static org.forgerock.http.protocol.Status.METHOD_NOT_ALLOWED;
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.cloudfoundry.Responses.newEmptyResponse;
+import static org.forgerock.cloudfoundry.Responses.newEmptyJsonResponse;
+import static org.forgerock.json.JsonValue.array;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
+import java.util.List;
+
+import org.forgerock.cloudfoundry.services.Service;
 import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
@@ -35,8 +40,16 @@ import org.forgerock.util.promise.Promise;
  */
 public class CatalogHandler implements Handler {
 
-    private static final String SERVICE_ID = "3997be2d-e262-438e-8a31-8c90fa7156e5";
-    private static final String PLAN_ID = "0140f6db-972a-466e-9e79-7845098a4ec7";
+    private final Iterable<Service> services;
+
+    /**
+     * Constructs a new CatalogHandler.
+     *
+     * @param services The services that will be exposed by this catalog.
+     */
+    public CatalogHandler(Iterable<Service> services) {
+        this.services = services;
+    }
 
     /**
      * Handles catalog operations.
@@ -47,26 +60,17 @@ public class CatalogHandler implements Handler {
      */
     @Override
     public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
+        // Only GET is allowed
         if (!"GET".equals(request.getMethod())) {
-            return newResultPromise(newEmptyResponse(METHOD_NOT_ALLOWED));
+            return newResultPromise(newEmptyJsonResponse(Status.METHOD_NOT_ALLOWED));
         }
-        JsonValue result = json(object(field("services", array(object(
-                    field("id", SERVICE_ID),
-                field("name", "openam-oauth2"),
-                field("description", "Uses ForgeRock OpenAM to provide OAuth 2.0 authorization"),
-                field("tags", array("authentication", "oauth2")),
-                field("bindable", true),
-                field("metadata", object(
-                        field("displayName", "ForgeRock OpenAM")
-                )),
-                field("plans", array(
-                        object(
-                                field("id", PLAN_ID),
-                                field("name", "shared"),
-                                field("description", "Shared OpenAM server")
-                        )
-                ))
-        )))));
-        return newResultPromise(newEmptyResponse(Status.OK).setEntity(result));
+
+        List<Object> arrayServices = array();
+        for (Service service : services) {
+            arrayServices.add(service.getServiceMetadata());
+        }
+        JsonValue result = json(object(field("services", arrayServices)));
+
+        return newResultPromise(new Response(Status.OK).setEntity(result));
     }
 }

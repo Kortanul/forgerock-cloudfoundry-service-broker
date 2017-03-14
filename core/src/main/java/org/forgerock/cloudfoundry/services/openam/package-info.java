@@ -14,28 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  */
 
-package org.forgerock.cloudfoundry;
-
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-
-import org.forgerock.http.protocol.Response;
-import org.forgerock.http.protocol.Status;
-
 /**
- * Utility class for Responses.
+ * This package will contain the classes required to implement the openam-oauth2 service.
  */
-public final class Responses {
-
-    private Responses() { }
-
-    /**
-     * Constructs a new empty response filled with an empty Json object.
-     *
-     * @param status The {@link Status} of the response.
-     * @return An empty {@link Response} with the specified {@link Status}.
-     */
-    public static Response newEmptyJsonResponse(Status status) {
-        return new Response(status).setEntity(json(object()));
-    }
-}
+package org.forgerock.cloudfoundry.services.openam;

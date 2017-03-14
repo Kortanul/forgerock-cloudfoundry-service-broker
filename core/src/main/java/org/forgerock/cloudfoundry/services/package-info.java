@@ -11,31 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyright [year] [name of copyright owner]".
  *
- * Copyright 2016 ForgeRock AS.
+ * Copyright 2017 ForgeRock AS.
  */
-
-package org.forgerock.cloudfoundry;
-
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-
-import org.forgerock.http.protocol.Response;
-import org.forgerock.http.protocol.Status;
 
 /**
- * Utility class for Responses.
+ * This package will contain the different implementations of the services we wan to expose in this CloudFoundry
+ * service broker.
  */
-public final class Responses {
-
-    private Responses() { }
-
-    /**
-     * Constructs a new empty response filled with an empty Json object.
-     *
-     * @param status The {@link Status} of the response.
-     * @return An empty {@link Response} with the specified {@link Status}.
-     */
-    public static Response newEmptyJsonResponse(Status status) {
-        return new Response(status).setEntity(json(object()));
-    }
-}
+package org.forgerock.cloudfoundry.services;

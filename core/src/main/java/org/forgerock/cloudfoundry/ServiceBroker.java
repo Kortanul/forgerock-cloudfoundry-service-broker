@@ -16,16 +16,21 @@
 
 package org.forgerock.cloudfoundry;
 
+import static org.forgerock.http.handler.Handlers.filtered;
 import static org.forgerock.http.routing.RouteMatchers.requestUriMatcher;
 import static org.forgerock.http.routing.RoutingMode.EQUALS;
 
-import org.forgerock.cloudfoundry.handlers.CatalogHandler;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.forgerock.cloudfoundry.handlers.BindingHandler;
+import org.forgerock.cloudfoundry.handlers.CatalogHandler;
 import org.forgerock.cloudfoundry.handlers.ProvisioningHandler;
 import org.forgerock.cloudfoundry.handlers.ServiceBrokerHandler;
+import org.forgerock.cloudfoundry.services.Service;
+import org.forgerock.cloudfoundry.services.openam.OpenAMOAuth2Service;
 import org.forgerock.http.Handler;
 import org.forgerock.http.HttpApplicationException;
-import org.forgerock.http.handler.Handlers;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.routing.Router;
@@ -52,14 +57,21 @@ public class ServiceBroker {
      */
     public ServiceBroker(Configuration configuration, PasswordGenerator pwGen)
             throws HttpApplicationException {
+        Map<String, Service> services = new HashMap<>();
+
         OpenAMClient openAMClient = new OpenAMClient(configuration);
+        OpenAMOAuth2Service openAmoAuth2Service = new OpenAMOAuth2Service(openAMClient, pwGen);
+        services.put(OpenAMOAuth2Service.SERVICE_ID, openAmoAuth2Service);
+
         Router router = new Router();
-        router.addRoute(requestUriMatcher(EQUALS, "/v2/catalog"), new CatalogHandler());
+        router.addRoute(requestUriMatcher(EQUALS, "/v2/catalog"),
+                new CatalogHandler(services.values()));
         router.addRoute(requestUriMatcher(EQUALS, "/v2/service_instances/{instanceId}"),
-                new ProvisioningHandler(openAMClient));
+                new ProvisioningHandler(services));
         router.addRoute(requestUriMatcher(EQUALS, "/v2/service_instances/{instanceId}/service_bindings/{bindingId}"),
-                new BindingHandler(openAMClient, pwGen));
-        handler = Handlers.filtered(router, new AuthenticationFilter(configuration));
+                new BindingHandler(services));
+
+        handler = filtered(router, new AuthenticationFilter(configuration));
     }
 
     /**

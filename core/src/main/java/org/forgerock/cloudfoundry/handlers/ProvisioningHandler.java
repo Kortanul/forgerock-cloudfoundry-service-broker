@@ -16,116 +16,34 @@
 
 package org.forgerock.cloudfoundry.handlers;
 
-import static org.forgerock.http.protocol.Status.METHOD_NOT_ALLOWED;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.guava.common.collect.Lists.newArrayList;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
-import org.forgerock.cloudfoundry.OpenAMClient;
-import org.forgerock.cloudfoundry.Responses;
-import org.forgerock.http.Handler;
+import org.forgerock.cloudfoundry.services.Service;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
-import org.forgerock.http.protocol.Status;
-import org.forgerock.http.routing.UriRouterContext;
-import org.forgerock.json.JsonValue;
 import org.forgerock.services.context.Context;
-import org.forgerock.util.AsyncFunction;
-import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
-import org.forgerock.util.promise.Promises;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Handles provision/deprovision operations against OpenAM.
+ * Delegates the provision/deprovision operations to the requested service.
  */
-public class ProvisioningHandler implements Handler {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProvisioningHandler.class);
-
-    private final OpenAMClient openAMClient;
+public class ProvisioningHandler extends BaseHandler {
 
     /**
      * Constructs a new ProvisioningHandler.
      *
-     * @param openAMClient The {@link OpenAMClient} used to communicate with OpenAM.
+     * @param services The services that will be exposed by this service broker.
      */
-    public ProvisioningHandler(OpenAMClient openAMClient) {
-        this.openAMClient = openAMClient;
+    public ProvisioningHandler(Map<String, Service> services) {
+        super(newArrayList("PUT", "PATCH", "DELETE"), services);
     }
 
-    /**
-     * Handles provisioning and deprovisioning operations.
-     *
-     * @param context The {@link Context}.
-     * @param request The {@link Request}.
-     * @return A {@link Promise} of a {@link Response}.
-     */
     @Override
-    public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
-        String instanceId = context.asContext(UriRouterContext.class).getUriTemplateVariables().get("instanceId");
-        switch (request.getMethod()) {
-        case "PUT":
-        case "PATCH":
-            LOGGER.info("Provisioning instance " + instanceId);
-            return newResultPromise(Responses.newEmptyResponse(Status.OK).setEntity(json(object())));
-        case "DELETE":
-            return handleDelete(context, request, instanceId);
-        default:
-            return newResultPromise(Responses.newEmptyResponse(METHOD_NOT_ALLOWED));
-        }
+    protected Promise<Response, NeverThrowsException> handle(Context context, Request request, Service service) {
+        return service.getProvisioningHandler().handle(context, request);
     }
 
-    private Promise<Response, NeverThrowsException> handleDelete(Context context, Request request,
-            final String instanceId) {
-        LOGGER.info("Deprovisioning instance " + instanceId);
-        return openAMClient.listClients().thenAsync(new AsyncFunction<Response, Response, NeverThrowsException>() {
-            @Override
-            public Promise<Response, NeverThrowsException> apply(Response response) throws NeverThrowsException {
-                if (!response.getStatus().isSuccessful()) {
-                    LOGGER.error("OpenAM returned an unexpected status (" + response.getStatus().getCode()
-                            + ") retrieving client list for instance " + instanceId);
-                    return newResultPromise(Responses.newEmptyResponse(Status.INTERNAL_SERVER_ERROR));
-                }
-                try {
-                    return deleteClients(response, instanceId);
-                } catch (IOException e) {
-                    LOGGER.error("OpenAM returned unparsable body retrieving client list for instance " + instanceId);
-                    return newResultPromise(Responses.newEmptyResponse(Status.INTERNAL_SERVER_ERROR));
-                }
-            }
-        });
-    }
-
-    private Promise<Response, NeverThrowsException> deleteClients(Response response, final String instanceId)
-            throws IOException {
-        JsonValue json = json(response.getEntity().getJson());
-        List<Promise<Response, NeverThrowsException>> deletionPromises = new ArrayList<>();
-        for (Object result : json.get("result").asList()) {
-            JsonValue r = json(result);
-            String username = r.get("username").asString();
-            if (username.startsWith(instanceId + "-")) {
-                deletionPromises.add(openAMClient.deleteClient(username));
-            }
-        }
-        return Promises.when(deletionPromises).then(new Function<List<Response>, Response, NeverThrowsException>() {
-            @Override
-            public Response apply(List<Response> responses) throws NeverThrowsException {
-                for (Response response : responses) {
-                    if (!response.getStatus().isSuccessful() && response.getStatus() != Status.BAD_REQUEST) {
-                        LOGGER.error("OpenAM returned an unexpected status (" + response.getStatus().getCode()
-                                + ") deleting client for instance " + instanceId);
-                        return Responses.newEmptyResponse(Status.INTERNAL_SERVER_ERROR);
-                    }
-                }
-                return Responses.newEmptyResponse(Status.OK);
-            }
-        });
-    }
 }
