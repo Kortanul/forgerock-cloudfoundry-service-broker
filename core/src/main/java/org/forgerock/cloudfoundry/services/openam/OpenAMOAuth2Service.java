@@ -24,7 +24,6 @@ import static org.forgerock.json.JsonValue.object;
 import org.forgerock.cloudfoundry.OpenAMClient;
 import org.forgerock.cloudfoundry.PasswordGenerator;
 import org.forgerock.cloudfoundry.services.Service;
-import org.forgerock.http.Handler;
 import org.forgerock.json.JsonValue;
 
 /**
@@ -38,8 +37,8 @@ public class OpenAMOAuth2Service implements Service {
     /** The identifier of the plan. */
     public static final String PLAN_ID = "0140f6db-972a-466e-9e79-7845098a4ec7";
 
-    private final Handler provisioningHandler;
-    private final Handler bindingHandler;
+    private final org.forgerock.cloudfoundry.services.ProvisioningService provisioningService;
+    private final org.forgerock.cloudfoundry.services.BindingService bindingService;
 
     /**
      * Constructs a service that will handle the creation of OAuth2 clients in OpenAM.
@@ -47,8 +46,8 @@ public class OpenAMOAuth2Service implements Service {
      * @param pwGen the password generator to use when creating the OAuth2 clients
      */
     public OpenAMOAuth2Service(OpenAMClient openAMClient, PasswordGenerator pwGen) {
-        this.provisioningHandler = new ProvisioningHandler(openAMClient);
-        this.bindingHandler = new BindingHandler(openAMClient, pwGen);
+        this.provisioningService = new OpenAMOAuth2ProvisioningService(openAMClient);
+        this.bindingService = new OpenAMOAuth2BindingService(openAMClient, pwGen);
     }
 
     @Override
@@ -74,13 +73,13 @@ public class OpenAMOAuth2Service implements Service {
     }
 
     @Override
-    public Handler getProvisioningHandler() {
-        return provisioningHandler;
+    public org.forgerock.cloudfoundry.services.ProvisioningService getProvisioningService() {
+        return provisioningService;
     }
 
     @Override
-    public Handler getBindingHandler() {
-        return bindingHandler;
+    public org.forgerock.cloudfoundry.services.BindingService getBindingService() {
+        return bindingService;
     }
 }
 

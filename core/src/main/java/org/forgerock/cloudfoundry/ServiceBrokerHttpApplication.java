@@ -16,11 +16,11 @@
 
 package org.forgerock.cloudfoundry;
 
+import org.forgerock.cloudfoundry.handlers.ServiceBrokerHandler;
 import org.forgerock.http.Handler;
 import org.forgerock.http.HttpApplication;
 import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.io.Buffer;
-import org.forgerock.cloudfoundry.handlers.ServiceBrokerHandler;
 import org.forgerock.util.Factory;
 
 /**
@@ -30,9 +30,16 @@ import org.forgerock.util.Factory;
  */
 public class ServiceBrokerHttpApplication implements HttpApplication {
 
+    private ServiceBroker broker;
+
     @Override
     public Handler start() throws HttpApplicationException {
-        return new ServiceBrokerHandler();
+        Configuration configuration = new ConfigurationEnvironmentReader().read();
+
+        broker = new ServiceBroker(configuration, new PasswordGenerator());
+
+        return new ServiceBrokerHandler(broker.getServices(), configuration.getBrokerUsername(),
+                configuration.getBrokerPassword());
     }
 
     @Override

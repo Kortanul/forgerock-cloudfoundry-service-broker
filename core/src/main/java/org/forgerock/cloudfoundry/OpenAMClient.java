@@ -124,12 +124,12 @@ public class OpenAMClient {
     }
 
     private Promise<Response, NeverThrowsException> getServerInfo() {
-        LOGGER.info("Retrieving OpenAM server info from "
-                + configuration.getOpenAmApiBaseUrl().resolve("serverinfo/*"));
+        URI serverInfoUri = configuration.getOpenAmApiBaseUrl().resolve("serverinfo/*");
+        LOGGER.info("Retrieving OpenAM server info from " + serverInfoUri);
         Request request = new Request();
         request.setMethod("GET");
         request.getHeaders().put("Accept-API-Version", "protocol=1.0, resource=1.1");
-        request.setUri(configuration.getOpenAmApiBaseUrl().resolve("serverinfo/*"));
+        request.setUri(serverInfoUri);
         return client.send(request);
     }
 

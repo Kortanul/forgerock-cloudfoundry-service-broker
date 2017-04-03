@@ -16,15 +16,9 @@
 
 package org.forgerock.cloudfoundry;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
-import com.google.common.collect.Lists;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.testng.annotations.Test;
 
 public class ConfigurationTest {
 
@@ -32,16 +26,14 @@ public class ConfigurationTest {
     private static final String MISSING = null;
 
     private Configuration config;
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    private String openigUri = "http://openig.example.com/";
 
     @Test
     public void testOAuth2URIWithRootRealm() {
         config = new Configuration("http://host:port/openam/", "user", "password", "/", "broker_user",
                 "broker_password", "scope1 scope2");
 
-        assertThat(config.getOpenAmOAuth2Url().toString(), is("http://host:port/openam/oauth2/"));
+        assertThat(config.getOpenAmOAuth2Url().toString()).isEqualTo("http://host:port/openam/oauth2/");
     }
 
     @Test
@@ -49,7 +41,7 @@ public class ConfigurationTest {
         config = new Configuration("http://host:port/openam/", "user", "password", "/subrealm", "broker_user",
                 "broker_password", "scope1 scope2");
 
-        assertThat(config.getOpenAmOAuth2Url().toString(), is("http://host:port/openam/oauth2/subrealm/"));
+        assertThat(config.getOpenAmOAuth2Url().toString()).isEqualTo("http://host:port/openam/oauth2/subrealm/");
     }
 
     @Test
@@ -57,7 +49,7 @@ public class ConfigurationTest {
         config = new Configuration("http://host:port/openam/", "user", "password", "/", "broker_user",
                 "broker_password", "scope1 scope2");
 
-        assertThat(config.getOpenAmApiRealmUrl().toString(), is("http://host:port/openam/json/"));
+        assertThat(config.getOpenAmApiRealmUrl().toString()).isEqualTo("http://host:port/openam/json/");
     }
 
     @Test
@@ -65,7 +57,7 @@ public class ConfigurationTest {
         config = new Configuration("http://host:port/openam/", "user", "password", MISSING, "broker_user",
                 "broker_password", "scope1 scope2");
 
-        assertThat(config.getOpenAmApiRealmUrl().toString(), is("http://host:port/openam/json/"));
+        assertThat(config.getOpenAmApiRealmUrl().toString()).isEqualTo("http://host:port/openam/json/");
     }
 
     @Test
@@ -73,7 +65,7 @@ public class ConfigurationTest {
         config = new Configuration("http://host:port/openam/", "user", "password", EMPTY, "broker_user",
                 "broker_password", "scope1 scope2");
 
-        assertThat(config.getOpenAmApiRealmUrl().toString(), is("http://host:port/openam/json/"));
+        assertThat(config.getOpenAmApiRealmUrl().toString()).isEqualTo("http://host:port/openam/json/");
     }
 
     @Test
@@ -81,7 +73,7 @@ public class ConfigurationTest {
         config = new Configuration("http://host:port/openam/", "user", "password", "realm", "broker_user",
                 "broker_password", "scope1 scope2");
 
-        assertThat(config.getOpenAmApiRealmUrl().toString(), is("http://host:port/openam/json/realm/"));
+        assertThat(config.getOpenAmApiRealmUrl().toString()).isEqualTo("http://host:port/openam/json/realm/");
     }
 
     @Test
@@ -89,7 +81,7 @@ public class ConfigurationTest {
         config = new Configuration("http://host:port/openam/", "user", "password", "realm", "broker_user",
                 "broker_password", "scope1 scope2");
 
-        assertThat(config.getOpenAmUsername(), is("user"));
+        assertThat(config.getOpenAmUsername()).isEqualTo("user");
     }
 
     @Test
@@ -97,67 +89,59 @@ public class ConfigurationTest {
         config = new Configuration("http://host:port/openam/", "user", "password", "realm", "broker_user",
                 "broker_password", "scope1 scope2");
 
-        assertThat(config.getOpenAmPassword(), is("password"));
+        assertThat(config.getOpenAmPassword()).isEqualTo("password");
     }
 
-    @Test
+    @Test(expectedExceptions = IllegalStateException.class,
+          expectedExceptionsMessageRegExp = "Required configuration missing: OPENAM_BASE_URI")
     public void missingBaseURIThrowsException() {
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Required configuration missing: OPENAM_BASE_URI");
-
         config = new Configuration(MISSING, "user", "password", "realm", "broker_user", "broker_password",
                 "scope1 scope2");
     }
 
-    @Test
+    @Test(expectedExceptions = IllegalStateException.class,
+          expectedExceptionsMessageRegExp = "Required configuration missing: OPENAM_BASE_URI")
     public void emptyBaseURIThrowsException() {
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Required configuration missing: OPENAM_BASE_URI");
 
         config = new Configuration(EMPTY, "user", "password", "realm", "broker_user", "broker_password",
                 "scope1 scope2");
     }
 
-    @Test
+    @Test(expectedExceptions = IllegalStateException.class,
+          expectedExceptionsMessageRegExp = "OPENAM_BASE_URI is not a valid URI")
     public void nonURIBaseURIThrowsException() {
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("OPENAM_BASE_URI is not a valid URI");
 
         config = new Configuration("not_a\\uri", "user", "password", "realm", "broker_user", "broker_password",
                 "scope1 scope2");
     }
 
-    @Test
+    @Test(expectedExceptions = IllegalStateException.class,
+          expectedExceptionsMessageRegExp = "Required configuration missing: OPENAM_USERNAME")
     public void missingUsernameThrowsException() {
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Required configuration missing: OPENAM_USERNAME");
 
         config = new Configuration("http://host:port/openam/", MISSING, "password", "realm", "broker_user",
                 "broker_password", "scope1 scope2");
     }
 
-    @Test
+    @Test(expectedExceptions = IllegalStateException.class,
+          expectedExceptionsMessageRegExp = "Required configuration missing: OPENAM_USERNAME")
     public void emptyUsernameThrowsException() {
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Required configuration missing: OPENAM_USERNAME");
 
         config = new Configuration("http://host:port/openam/", EMPTY, "password", "realm", "broker_user",
                 "broker_password", "scope1 scope2");
     }
 
-    @Test
+    @Test(expectedExceptions = IllegalStateException.class,
+          expectedExceptionsMessageRegExp = "Required configuration missing: OPENAM_PASSWORD")
     public void missingPasswordThrowsException() {
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Required configuration missing: OPENAM_PASSWORD");
 
         config = new Configuration("http://host:port/openam/", "user", MISSING, "realm", "broker_user",
                 "broker_password", "scope1 scope2");
     }
 
-    @Test
+    @Test(expectedExceptions = IllegalStateException.class,
+          expectedExceptionsMessageRegExp = "Required configuration missing: OPENAM_PASSWORD")
     public void emptyPasswordThrowsException() {
-        thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Required configuration missing: OPENAM_PASSWORD");
 
         config = new Configuration("http://host:port/openam/", "user", EMPTY, "realm", "broker_user",
                 "broker_password", "scope1 scope2");
@@ -168,7 +152,7 @@ public class ConfigurationTest {
         config = new Configuration("http://host:port/openam/", "user", "password", "/", "broker_user",
                 "broker_password", "scope1 scope2");
 
-        assertThat(config.getScopes(), is((List<String>) Lists.newArrayList("scope1", "scope2")));
+        assertThat(config.getScopes()).containsExactly("scope1", "scope2");
     }
 
 }

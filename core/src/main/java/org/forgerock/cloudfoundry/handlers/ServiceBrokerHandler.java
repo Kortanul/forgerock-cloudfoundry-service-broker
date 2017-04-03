@@ -16,14 +16,19 @@
 
 package org.forgerock.cloudfoundry.handlers;
 
-import org.forgerock.cloudfoundry.ConfigurationEnvironmentReader;
-import org.forgerock.cloudfoundry.OpenAMClient;
-import org.forgerock.cloudfoundry.PasswordGenerator;
+import static org.forgerock.http.handler.Handlers.chainOf;
+import static org.forgerock.http.routing.RouteMatchers.requestUriMatcher;
+import static org.forgerock.http.routing.RoutingMode.EQUALS;
+
+import java.util.Map;
+
+import org.forgerock.cloudfoundry.AuthenticationFilter;
 import org.forgerock.cloudfoundry.ServiceBroker;
+import org.forgerock.cloudfoundry.services.Service;
 import org.forgerock.http.Handler;
-import org.forgerock.http.HttpApplicationException;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
+import org.forgerock.http.routing.Router;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
@@ -35,18 +40,29 @@ import org.forgerock.util.promise.Promise;
  */
 public class ServiceBrokerHandler implements Handler {
 
-    private final ServiceBroker broker = new ServiceBroker(new ConfigurationEnvironmentReader().read(),
-            new PasswordGenerator());
+    private final Handler handler;
 
     /**
-     * Constructs new ServiceBrokerHandler.
-     *
-     * @throws HttpApplicationException if underlying {@link OpenAMClient} throws a {@link HttpApplicationException}.
+     * Construct a new ServiceBrokerHandler.
+     * @param services the service to manage.
+     * @param brokerUsername the username to access this service broker.
+     * @param brokerPassword the password to access this service broker.
      */
-    public ServiceBrokerHandler() throws HttpApplicationException { }
+    public ServiceBrokerHandler(Map<String, Service> services, String brokerUsername, String brokerPassword) {
+        Router router = new Router();
+        router.addRoute(requestUriMatcher(EQUALS, "/v2/catalog"),
+                new CatalogHandler(services.values()));
+        router.addRoute(requestUriMatcher(EQUALS, "/v2/service_instances/{instanceId}"),
+                new ProvisioningHandler(services));
+        router.addRoute(requestUriMatcher(EQUALS, "/v2/service_instances/{instanceId}/service_bindings/{bindingId}"),
+                new BindingHandler(services));
+
+        handler = chainOf(router, new AuthenticationFilter(brokerUsername, brokerPassword));
+    }
 
     @Override
     public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
-        return broker.handle(context, request);
+        return handler.handle(context, request);
     }
+
 }

@@ -16,34 +16,83 @@
 
 package org.forgerock.cloudfoundry.handlers;
 
-import static org.forgerock.guava.common.collect.Lists.newArrayList;
+import static org.forgerock.cloudfoundry.Responses.newEmptyJsonResponse;
+import static org.forgerock.cloudfoundry.Responses.newErrorJsonResponse;
+import static org.forgerock.http.protocol.Status.BAD_REQUEST;
+import static org.forgerock.http.protocol.Status.INTERNAL_SERVER_ERROR;
+import static org.forgerock.http.protocol.Status.METHOD_NOT_ALLOWED;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
+import java.io.IOException;
 import java.util.Map;
 
+import org.forgerock.cloudfoundry.services.ProvisioningService;
 import org.forgerock.cloudfoundry.services.Service;
+import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
+import org.forgerock.http.routing.UriRouterContext;
+import org.forgerock.json.JsonValue;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Delegates the provision/deprovision operations to the requested service.
  */
-public class ProvisioningHandler extends BaseHandler {
+public class ProvisioningHandler implements Handler {
 
-    /**
-     * Constructs a new ProvisioningHandler.
-     *
-     * @param services The services that will be exposed by this service broker.
-     */
-    public ProvisioningHandler(Map<String, Service> services) {
-        super(newArrayList("PUT", "PATCH", "DELETE"), services);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProvisioningHandler.class);
+
+    private final Map<String, Service> services;
+
+    ProvisioningHandler(Map<String, Service> services) {
+        this.services = services;
     }
 
     @Override
-    protected Promise<Response, NeverThrowsException> handle(Context context, Request request, Service service) {
-        return service.getProvisioningHandler().handle(context, request);
-    }
+    public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
+        // /v2/service_instances/:instance_id
+        final String instanceId = context.asContext(UriRouterContext.class).getUriTemplateVariables().get("instanceId");
 
+        switch (request.getMethod()) {
+        case "PUT":
+        case "PATCH":
+            // https://docs.cloudfoundry.org/services/api.html#provisioning
+            try {
+                JsonValue body = new JsonValue(request.getEntity().getJson());
+                String serviceId = body.get("service_id").asString();
+                Service service = services.get(serviceId);
+                if (service == null) {
+                    return newResultPromise(newErrorJsonResponse(BAD_REQUEST,
+                            "Unknown service_id : " + serviceId));
+                }
+                ProvisioningService provisioningService = service.getProvisioningService();
+                JsonValue parameters = body.get("parameters");
+
+                switch (request.getMethod()) {
+                case "PUT":
+                    return provisioningService.provision(instanceId, parameters);
+                case "PATCH":
+                    return provisioningService.update(instanceId, parameters);
+                }
+            } catch (IOException e) {
+                return newResultPromise(newErrorJsonResponse(INTERNAL_SERVER_ERROR, e));
+            }
+        case "DELETE":
+            // https://docs.cloudfoundry.org/services/api.html#deprovisioning
+            LOGGER.info("Deprovisioning service instance " + instanceId);
+            String serviceId = request.getForm().getFirst("service_id");
+            Service service = services.get(serviceId);
+            if (service == null) {
+                return newResultPromise(newErrorJsonResponse(BAD_REQUEST,
+                        "Unknown service_id : " + serviceId));
+            }
+            return service.getProvisioningService().deprovision(instanceId);
+        default:
+            return newResultPromise(newEmptyJsonResponse(METHOD_NOT_ALLOWED));
+        }
+    }
 }

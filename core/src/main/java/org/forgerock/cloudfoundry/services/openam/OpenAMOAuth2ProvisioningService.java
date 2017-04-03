@@ -17,7 +17,6 @@
 package org.forgerock.cloudfoundry.services.openam;
 
 import static org.forgerock.cloudfoundry.Responses.newEmptyJsonResponse;
-import static org.forgerock.http.protocol.Status.METHOD_NOT_ALLOWED;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
@@ -26,13 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.forgerock.cloudfoundry.OpenAMClient;
-import org.forgerock.http.Handler;
-import org.forgerock.http.protocol.Request;
+import org.forgerock.cloudfoundry.services.ProvisioningService;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
-import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonValue;
-import org.forgerock.services.context.Context;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
@@ -44,9 +40,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Handles provision/deprovision operations against OpenAM.
  */
-class ProvisioningHandler implements Handler {
+class OpenAMOAuth2ProvisioningService implements ProvisioningService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProvisioningHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenAMOAuth2ProvisioningService.class);
 
     private final OpenAMClient openAMClient;
 
@@ -55,34 +51,24 @@ class ProvisioningHandler implements Handler {
      *
      * @param openAMClient The {@link OpenAMClient} used to communicate with OpenAM.
      */
-    public ProvisioningHandler(OpenAMClient openAMClient) {
+    public OpenAMOAuth2ProvisioningService(OpenAMClient openAMClient) {
         this.openAMClient = openAMClient;
     }
 
-    /**
-     * Handles provisioning and deprovisioning operations.
-     *
-     * @param context The {@link Context}.
-     * @param request The {@link Request}.
-     * @return A {@link Promise} of a {@link Response}.
-     */
     @Override
-    public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
-        String instanceId = context.asContext(UriRouterContext.class).getUriTemplateVariables().get("instanceId");
-        switch (request.getMethod()) {
-        case "PUT":
-        case "PATCH":
-            LOGGER.info("Provisioning instance " + instanceId);
-            return newResultPromise(newEmptyJsonResponse(Status.OK));
-        case "DELETE":
-            return handleDelete(context, request, instanceId);
-        default:
-            return newResultPromise(newEmptyJsonResponse(METHOD_NOT_ALLOWED));
-        }
+    public Promise<Response, NeverThrowsException> provision(String instanceId, JsonValue parameters) {
+        LOGGER.info("Provisioning instance " + instanceId);
+        return newResultPromise(newEmptyJsonResponse(Status.OK));
     }
 
-    private Promise<Response, NeverThrowsException> handleDelete(Context context, Request request,
-            final String instanceId) {
+    @Override
+    public Promise<Response, NeverThrowsException> update(String instanceId, JsonValue parameters) {
+        LOGGER.info("Updating instance " + instanceId);
+        return newResultPromise(newEmptyJsonResponse(Status.OK));
+    }
+
+    @Override
+    public Promise<Response, NeverThrowsException> deprovision(final String instanceId) {
         LOGGER.info("Deprovisioning instance " + instanceId);
         return openAMClient.listClients().thenAsync(new AsyncFunction<Response, Response, NeverThrowsException>() {
             @Override
@@ -127,4 +113,5 @@ class ProvisioningHandler implements Handler {
             }
         });
     }
+
 }

@@ -39,7 +39,7 @@ public final class Configuration {
 
     /**
      * Constructs a new Configuration.
-     *  @param baseUri the base URI of OpenAM
+     * @param baseUri the base URI of OpenAM
      * @param openAmUsername the username to use to authenticate against OpenAM
      * @param openAmPassword the password to use to authenticate against OpenAM
      * @param realm the OpenAM realm to use

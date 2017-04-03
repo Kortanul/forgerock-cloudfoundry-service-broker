@@ -16,6 +16,7 @@
 
 package org.forgerock.cloudfoundry;
 
+import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 
@@ -38,4 +39,42 @@ public final class Responses {
     public static Response newEmptyJsonResponse(Status status) {
         return new Response(status).setEntity(json(object()));
     }
+
+    /**
+     * Constructs a new response filled with a Json object carrying a description about the error.
+     *
+     * @param status The {@link Status} of the response.
+     * @param description A description of the error.
+     * @return An {@link Response} with the specified {@link Status} containing a Json object filled
+     * with a description about the error.
+     */
+    public static Response newErrorJsonResponse(Status status, String description) {
+        return new Response(status).setEntity(json(object(field("description", description))));
+    }
+
+    /**
+     * Constructs a new response filled with a Json object carrying a description about the error.
+     *
+     * @param status The {@link Status} of the response.
+     * @param exception The exception that caused an error.
+     * @return An {@link Response} with the specified {@link Status} containing a Json object filled
+     * with a description about the error.
+     */
+    public static Response newErrorJsonResponse(Status status, Exception exception) {
+        return newErrorJsonResponse(status, exception, exception.getMessage());
+    }
+
+    /**
+     * Constructs a new response filled with a Json object carrying a description about the error.
+     *
+     * @param status The {@link Status} of the response.
+     * @param exception The exception that caused an error.
+     * @param description A description of the error.
+     * @return An {@link Response} with the specified {@link Status} containing a Json object filled
+     * with a description about the error.
+     */
+    public static Response newErrorJsonResponse(Status status, Exception exception, String description) {
+        return new Response(status).setCause(exception).setEntity(json(object(field("description", description))));
+    }
+
 }

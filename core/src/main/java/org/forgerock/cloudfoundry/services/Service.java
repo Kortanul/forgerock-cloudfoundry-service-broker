@@ -16,7 +16,6 @@
 
 package org.forgerock.cloudfoundry.services;
 
-import org.forgerock.http.Handler;
 import org.forgerock.json.JsonValue;
 
 /**
@@ -31,16 +30,15 @@ public interface Service {
     JsonValue getServiceMetadata();
 
     /**
-     * Returns the {@link Handler} used to manage the provisioning operations.
-     * @return the {@link Handler} used to manage the provisioning operations.
+     * Returns the {@link ProvisioningService} used to manage the provisioning operations.
+     * @return the {@link ProvisioningService} used to manage the provisioning operations.
      */
-    Handler getProvisioningHandler();
+    ProvisioningService getProvisioningService();
 
     /**
-     * Returns the {@link Handler} used to manage the binding operations.
-     * @return the {@link Handler} used to manage the binding operations.
+     * Returns the {@link BindingService} used to manage the binding operations.
+     * @return the {@link BindingService} used to manage the binding operations.
      */
-    Handler getBindingHandler();
-
+    BindingService getBindingService();
 }
 

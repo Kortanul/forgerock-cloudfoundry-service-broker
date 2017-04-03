@@ -19,12 +19,15 @@ import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import static org.mockserver.model.StringBody.exact;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.forgerock.http.protocol.Request;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
+import org.forgerock.util.encode.Base64;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
@@ -192,4 +195,15 @@ public final class TestHelper {
         };
     }
 
+    public static Request createRequest(String method, String path) throws Exception {
+        Request request = new Request();
+        request.setMethod(method);
+        request.setUri("http://broker.example/" + path);
+        request.getHeaders().put("Authorization", createBasicAuth("broker_user", "broker_password"));
+        return request;
+    }
+
+    public static String createBasicAuth(String username, String password) {
+        return "Basic " + Base64.encode((username + ":" + password).getBytes(StandardCharsets.ISO_8859_1));
+    }
 }

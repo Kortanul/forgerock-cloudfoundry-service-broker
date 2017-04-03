@@ -16,6 +16,8 @@
 
 package org.forgerock.cloudfoundry;
 
+import static org.forgerock.http.protocol.Response.newResponsePromise;
+
 import java.nio.charset.StandardCharsets;
 
 import org.forgerock.http.Filter;
@@ -34,14 +36,17 @@ import org.forgerock.util.promise.Promise;
  * and password.
  */
 public class AuthenticationFilter implements Filter {
+
     private final String expectedAuthorizationHeader;
 
     /**
-     * Constructions a new authentication filter.
-     * @param configuration the broker configuration.
+     * Constructs a new authentication filter.
+     *
+     * @param brokerUsername the broker's username
+     * @param brokerPassword the broker's password
      */
-    public AuthenticationFilter(Configuration configuration) {
-        String usernamePassword = configuration.getBrokerUsername() + ":" + configuration.getBrokerPassword();
+    public AuthenticationFilter(String brokerUsername, String brokerPassword) {
+        String usernamePassword = brokerUsername + ":" + brokerPassword;
         expectedAuthorizationHeader = "Basic " + Base64.encode(usernamePassword.getBytes(StandardCharsets.ISO_8859_1));
     }
 
@@ -49,9 +54,8 @@ public class AuthenticationFilter implements Filter {
     public Promise<Response, NeverThrowsException> filter(Context context, Request request, Handler next) {
         if (isAuthenticated(request)) {
             return next.handle(context, request);
-        } else {
-            return Response.newResponsePromise(new Response(Status.UNAUTHORIZED));
         }
+        return newResponsePromise(new Response(Status.UNAUTHORIZED));
     }
 
     private boolean isAuthenticated(Request request) {
